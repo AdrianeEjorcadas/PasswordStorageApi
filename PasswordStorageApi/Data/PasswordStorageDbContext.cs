@@ -12,6 +12,7 @@ namespace PasswordStorageApi.Data
 
         public DbSet<UserModel> Users { get; set; }
         public DbSet<PasswordModel> Passwords { get; set; }
+        public DbSet<PlatformModel> Platforms { get; set; }
         public DbSet<AuditLogModel> AuditLogs { get; set; }
     }
 }

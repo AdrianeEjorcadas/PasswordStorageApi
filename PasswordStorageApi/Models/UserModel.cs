@@ -26,5 +26,6 @@ namespace PasswordStorageApi.Models
 
         //Navigation property
         public ICollection<PasswordModel> Passwords { get; set; }
+        public ICollection<AuditLogModel> AuditLogs { get; set; }
     }
 }

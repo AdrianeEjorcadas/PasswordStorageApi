@@ -14,6 +14,10 @@ namespace PasswordStorageApi.Models
         public int UserId { get; set; }
 
         [Required]
+        [ForeignKey("PlatformId")]
+        public int PlatformId { get; set; }
+
+        [Required]
         public string HashedPassword { get; set; }
 
         [Required]
@@ -27,10 +31,11 @@ namespace PasswordStorageApi.Models
         public DateTime? LastUsedAt { get; set; }
 
         public bool IsCurrent { get; set; }
-        public bool IsCompromised { get; set; }
+        //public bool IsCompromised { get; set; }
         public bool IsDeleted { get; set; }
 
         //Navigation property
         public UserModel User { get; set; }
+        public PlatformModel Platform { get; set; }
     }
 }
