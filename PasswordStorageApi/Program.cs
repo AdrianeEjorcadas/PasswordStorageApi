@@ -1,7 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using PasswordStorageApi.Data;
 using Microsoft.OpenApi.Models; // Add this using directive
-using Microsoft.Extensions.DependencyInjection; // Add this using directive
+using Microsoft.Extensions.DependencyInjection;
+using PasswordStorageApi.Repository.Interface;
+using PasswordStorageApi.Repository.Implementation;
+using PasswordStorageApi.Service.Interface;
+using PasswordStorageApi.Service.Implementaion; // Add this using directive
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +19,20 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<PasswordStorageDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+//add repository
+builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
+//add service
+builder.Services.AddScoped<IPlatformService, PlatformService>();
+
+//Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
 });
 
 // Add Swagger services
@@ -40,6 +58,8 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty; // Optional: Serve Swagger UI at the root
     });
 }
+
+app.UseCors("AllowAllOrigins");
 
 app.UseHttpsRedirection();
 

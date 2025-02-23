@@ -10,8 +10,9 @@ namespace PasswordStorageApi.Models
 
         [StringLength(50)]
         public string? PlatformName { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         //navigation property
-        public ICollection<PasswordModel> Passwords { get; set; }
+        //public ICollection<PasswordModel> Passwords { get; set; }
     }
 }

@@ -18,8 +18,11 @@ namespace PasswordStorageApi.Models
         public string Action { get; set; }
 
         [Required]
+        public long UnixTimeStamp { get; set; }
+
+        [Required]
         [DataType(DataType.DateTime)]
-        public DateTime TimeStamp { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         [Required]
         [StringLength(50)]
