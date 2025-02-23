@@ -19,12 +19,12 @@ namespace PasswordStorageApi.Repository.Implementation
             return platform;
         }
 
-        public async Task<IEnumerable<PlatformModel>> GetAllPlatforms()
+        public async Task<IEnumerable<PlatformModel?>> GetAllPlatforms()
         {
             return await _context.Platforms.ToListAsync();
         }
 
-        public async Task<PlatformModel> GetPlatformById(int platformId)
+        public async Task<PlatformModel?> GetPlatformById(int platformId)
         {
             return await _context.Platforms.FindAsync(platformId);
         }

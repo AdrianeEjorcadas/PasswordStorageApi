@@ -16,11 +16,15 @@ namespace PasswordStorageApi.Controllers
         }
         //Get
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PlatformModel>>> GetAllPlatforms()
+        public async Task<ActionResult<IEnumerable<PlatformModel?>>> GetAllPlatforms()
         {
             try
             {
                 var platforms = await _platformService.GetAllPlatforms();
+                if(platforms == null)
+                {
+                    return NotFound();
+                }
                 return Ok(platforms);
             }
             catch (Exception ex)
@@ -31,11 +35,15 @@ namespace PasswordStorageApi.Controllers
 
         //Get by id
         [HttpGet("{platformId}")]
-        public async Task<ActionResult<PlatformModel>> GetPlatformById(int platformId)
+        public async Task<ActionResult<PlatformModel?>> GetPlatformById(int platformId)
         {
             try
             {
                 var platform = await _platformService.GetPlatformById(platformId);
+                if (platform == null)
+                {
+                    return NotFound();
+                }
                 return Ok(platform);
             }
             catch (Exception ex)

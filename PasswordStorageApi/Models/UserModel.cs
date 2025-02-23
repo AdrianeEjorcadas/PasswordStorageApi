@@ -24,8 +24,8 @@ namespace PasswordStorageApi.Models
         public bool IsVerified { get; set; }
         public bool IsDeleted { get; set; }
 
-        //Navigation property
-        public ICollection<PasswordModel> Passwords { get; set; }
-        public ICollection<AuditLogModel> AuditLogs { get; set; }
+        ////Navigation property
+        //public ICollection<PasswordModel> Passwords { get; set; }
+        //public ICollection<AuditLogModel> AuditLogs { get; set; }
     }
 }

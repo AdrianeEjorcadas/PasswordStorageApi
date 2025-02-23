@@ -26,7 +26,7 @@ builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
 //add service
 builder.Services.AddScoped<IPlatformService, PlatformService>();
 
-//Add CORS
+//Add CORS - since i am getting an Httpconnectivity error
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
