@@ -18,7 +18,7 @@ namespace PasswordStorageApi.Models
         public int PlatformId { get; set; }
 
         [Required]
-        public string HashedPassword { get; set; }
+        public string EncryptedPassword { get; set; }
 
         [Required]
         public string Salt { get; set; }
