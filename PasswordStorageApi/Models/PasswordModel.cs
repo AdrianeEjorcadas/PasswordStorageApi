@@ -23,16 +23,22 @@ namespace PasswordStorageApi.Models
         [Required]
         public string Salt { get; set; }
 
-        [Required]
-        public DateTime CreatedAt { get; set; }
-
-        public DateTime? UpdatedAt { get; set; }
-
-        public DateTime? LastUsedAt { get; set; }
-
         public bool IsCurrent { get; set; }
         //public bool IsCompromised { get; set; }
         public bool IsDeleted { get; set; }
+
+        [DataType(DataType.DateTime)]
+        public DateTime? LastUsedAt { get; set; }
+
+
+        [DataType(DataType.DateTime)]
+        public DateTime CreatedAt { get; set; }
+
+        [DataType(DataType.DateTime)]
+        public DateTime? UpdatedAt { get; set; }
+
+        [DataType(DataType.DateTime)]
+        public DateTime? DeletedAt { get; set; }
 
         //Navigation property
         public UserModel User { get; set; }

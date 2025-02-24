@@ -7,6 +7,7 @@ namespace PasswordStorageApi.Repository.Interface
         Task<IEnumerable<PlatformModel?>> GetAllPlatforms();
         Task<PlatformModel?> GetPlatformById(int platformId);
         Task<PlatformModel> AddPlatform(PlatformModel platform);
-        Task<PlatformModel> UpdatePlatform(PlatformModel platform);
+        Task<PlatformModel> UpdatePlatform(int platformId, PlatformModel platform);
+        Task<PlatformModel> DeletePlatform(int platformId);
     }
 }

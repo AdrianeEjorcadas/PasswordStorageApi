@@ -15,20 +15,26 @@ namespace PasswordStorageApi.Data
         public DbSet<PlatformModel> Platforms { get; set; }
         public DbSet<AuditLogModel> AuditLogs { get; set; }
 
+        // Override SaveChanges to call CreatedAt(), UpdatedAt(), and DeletedAt() method
         public override int SaveChanges()
         {
             CreatedAt();
+            UpdatedAt();
             return base.SaveChanges();
         }
 
+        // Override SaveChangesAsync to call CreatedAt(), UpdatedAt(), and DeletedAt() method
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             CreatedAt();
+            UpdatedAt();
             return base.SaveChangesAsync(cancellationToken);
         }
 
+        // Set the CreatedAt property for the entities
         private void CreatedAt()
         {
+            // Get the entities that are being added
             var entries = ChangeTracker.Entries()
             .Where(e => e.State == EntityState.Added);
 
@@ -40,22 +46,55 @@ namespace PasswordStorageApi.Data
                 if (entry.Entity is PlatformModel platform)
                 {
                     platform.CreatedAt = currentUtcTime;
+                    platform.IsDeleted = false;
                 }
                 else if (entry.Entity is PasswordModel password)
                 {
                     password.CreatedAt = currentUtcTime;
+                    password.IsDeleted = false;
                 }
                 else if (entry.Entity is UserModel user)
                 {
                     user.CreatedAt = currentUtcTime;
+                    user.IsDeleted = false;
                 }
                 else if(entry.Entity is AuditLogModel auditLog)
                 {
                     auditLog.CreatedAt = currentUtcTime;
                     auditLog.UnixTimeStamp = ((DateTimeOffset)currentUtcTime).ToUnixTimeSeconds();
+                    auditLog.IsDeleted = false;
                 }
             }
         }
+
+        //Set the UpdatedAt property for the entities
+        public void UpdatedAt()
+        {
+            // Get the entities that are being modified
+            var entries = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Modified);
+
+            // Get the current UTC time
+            DateTime currentUtcTime = DateTime.UtcNow;
+
+           foreach(var entry in entries)
+            {
+                if (entry.Entity is UserModel user)
+                {
+                    user.UpdatedAt = currentUtcTime;
+                }
+                else if(entry.Entity is PlatformModel platform)
+                {
+                    platform.UpdatedAt = currentUtcTime;
+                }
+            }
+        }
+
+        //public void DeletedAt()
+        //{
+        //    var entries = ChangeTracker.Entries()
+        //        .Where(e => e.State != EntityState.Deleted);
+        //}
 
     }
 }

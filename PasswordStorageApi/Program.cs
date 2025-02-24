@@ -23,8 +23,10 @@ builder.Services.AddDbContext<PasswordStorageDbContext>(options =>
 
 //add repository
 builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 //add service
 builder.Services.AddScoped<IPlatformService, PlatformService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 //Add CORS - since i am getting an Httpconnectivity error
 builder.Services.AddCors(options =>

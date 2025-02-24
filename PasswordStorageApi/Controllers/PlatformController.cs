@@ -14,7 +14,8 @@ namespace PasswordStorageApi.Controllers
         {
             _platformService = platformService;
         }
-        //Get
+
+        //Get All Platform
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PlatformModel?>>> GetAllPlatforms()
         {
@@ -42,7 +43,7 @@ namespace PasswordStorageApi.Controllers
                 var platform = await _platformService.GetPlatformById(platformId);
                 if (platform == null)
                 {
-                    return NotFound();
+                    return NotFound("Platform does not exist!");
                 }
                 return Ok(platform);
             }
@@ -52,6 +53,7 @@ namespace PasswordStorageApi.Controllers
             }
         }
 
+        //Post Add Platform
         [HttpPost("AddPlatform")]
         public async Task<ActionResult<PlatformModel>> AddPlatform([FromBody]PlatformModel platform)
         {
@@ -68,6 +70,49 @@ namespace PasswordStorageApi.Controllers
             {
                 return BadRequest(new { Message = ex.Message });
             }
+        }
+
+        [HttpPut("UpdatePlatform/{platformId}")]
+        public async Task<ActionResult<PlatformModel>> UpdatePlatform(int platformId, [FromBody]PlatformModel platform)
+        {
+            try
+            {
+                var updatedPlatform = await _platformService.UpdatePlatform(platformId, platform);
+
+                if (updatedPlatform == null)
+                    return NotFound("Platform does not exist!");
+
+                return CreatedAtAction(nameof(GetPlatformById), new { platformId = platform.PlatformId }, platform);
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        [HttpPut("DeletePlatform/{platformId}")]
+        public async Task<ActionResult<PlatformModel>> DeletePlatform(int platformId)
+        {
+            try
+            {
+                var deletePlatform = await _platformService.DeletePlatform(platformId);
+                if (deletePlatform == null)
+                    return NotFound("Platform does not exist");
+                return Ok("Successfully Deleted");
+            }
+            catch (HttpRequestException htex)
+            {
+                return BadRequest(new { Message = htex.Message });
+            }
+            catch(Exception ex)
+            {
+                return BadRequest($"Unable to delete item: {ex.Message}");
+            }
+
         }
     }
 }

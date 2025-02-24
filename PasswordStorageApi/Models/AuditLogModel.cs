@@ -21,15 +21,17 @@ namespace PasswordStorageApi.Models
         public long UnixTimeStamp { get; set; }
 
         [Required]
-        [DataType(DataType.DateTime)]
-        public DateTime CreatedAt { get; set; }
-
-        [Required]
         [StringLength(50)]
         public string IpAddress { get; set; }
 
         public bool IsArchived { get; set; }
         public bool IsDeleted { get; set; }
+
+        [DataType(DataType.DateTime)]
+        public DateTime CreatedAt { get; set; }
+
+        [DataType(DataType.DateTime)]
+        public DateTime? DeletedAt { get; set; }
 
 
         //Navigation property

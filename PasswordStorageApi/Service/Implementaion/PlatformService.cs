@@ -26,9 +26,14 @@ namespace PasswordStorageApi.Service.Implementaion
             return await _platformRepository.GetPlatformById(platformId);
         }
 
-        public async Task<PlatformModel> UpdatePlatform(PlatformModel platform)
+        public async Task<PlatformModel> UpdatePlatform(int platformId, PlatformModel platform)
         {
-            throw new NotImplementedException();
+            return await _platformRepository.UpdatePlatform(platformId, platform);
+        }
+
+        public async Task<PlatformModel> DeletePlatform(int platformId)
+        {
+            return await _platformRepository.DeletePlatform(platformId);
         }
     }
 }
