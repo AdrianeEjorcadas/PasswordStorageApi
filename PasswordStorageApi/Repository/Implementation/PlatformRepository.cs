@@ -22,7 +22,6 @@ namespace PasswordStorageApi.Repository.Implementation
         public async Task<IEnumerable<PlatformModel?>> GetAllPlatforms()
         {
             return await _context.Platforms
-                .Where(e => !e.IsDeleted)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -30,7 +29,7 @@ namespace PasswordStorageApi.Repository.Implementation
         public async Task<PlatformModel?> GetPlatformById(int platformId)
         {
             return await _context.Platforms
-                .Where(e => !e.IsDeleted && platformId == e.PlatformId)
+                .Where(e => platformId == e.PlatformId)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
         }
@@ -38,7 +37,7 @@ namespace PasswordStorageApi.Repository.Implementation
         public async Task<PlatformModel> UpdatePlatform(int platformId, PlatformModel platform)
         {
             var platformToUpdate = await _context.Platforms
-                .Where(e => !e.IsDeleted && platformId == e.PlatformId)
+                .Where(e => platformId == e.PlatformId)
                 .FirstOrDefaultAsync();
 
 
@@ -51,7 +50,7 @@ namespace PasswordStorageApi.Repository.Implementation
         public async Task<PlatformModel> DeletePlatform(int platformId)
         {
             var platformToDelete = await _context.Platforms
-                .Where(e => !e.IsDeleted && platformId == e.PlatformId)
+                .Where(e => platformId == e.PlatformId)
                 .FirstOrDefaultAsync();
 
             platformToDelete.IsDeleted = true;

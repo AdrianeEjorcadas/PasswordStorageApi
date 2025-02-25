@@ -1,13 +1,14 @@
 ﻿using PasswordStorageApi.Models;
 using PasswordStorageApi.Repository.Implementation;
+using PasswordStorageApi.Repository.Interface;
 using PasswordStorageApi.Service.Interface;
 
 namespace PasswordStorageApi.Service.Implementaion
 {
     public class UserService : IUserService
     {
-        private readonly UserRepository _userRepository;
-        public UserService(UserRepository userRepository)
+        private readonly IUserRepository _userRepository;
+        public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }

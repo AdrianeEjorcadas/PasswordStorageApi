@@ -15,6 +15,17 @@ namespace PasswordStorageApi.Data
         public DbSet<PlatformModel> Platforms { get; set; }
         public DbSet<AuditLogModel> AuditLogs { get; set; }
 
+        //Global filter for deleted item
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<UserModel>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<PlatformModel>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<PasswordModel>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<AuditLogModel>().HasQueryFilter(e => !e.IsDeleted);
+        }
+
         // Override SaveChanges to call CreatedAt(), UpdatedAt(), and DeletedAt() method
         public override int SaveChanges()
         {
@@ -90,11 +101,41 @@ namespace PasswordStorageApi.Data
             }
         }
 
-        //public void DeletedAt()
-        //{
-        //    var entries = ChangeTracker.Entries()
-        //        .Where(e => e.State != EntityState.Deleted);
-        //}
+        // Set the DeletedAt property for the entities
+        public void DeletedAt()
+        {
+            var entries = ChangeTracker.Entries()
+                .Where(e => e.State != EntityState.Deleted);
+
+            // Get the current UTC time
+            DateTime currentUtcTime = DateTime.UtcNow;
+
+            foreach(var entry in entries)
+            {
+                entry.State = EntityState.Modified;
+
+                if(entry.Entity is UserModel user)
+                {
+                    user.IsDeleted = true;
+                    user.DeletedAt = currentUtcTime;
+                }
+                else if (entry.Entity is PlatformModel platform)
+                {
+                    platform.IsDeleted = true;
+                    platform.DeletedAt = currentUtcTime;
+                }
+                else if(entry.Entity is PasswordModel password)
+                {
+                    password.IsDeleted = true;
+                    password.DeletedAt = currentUtcTime;
+                } 
+                else if(entry.Entity is AuditLogModel auditLog)
+                {
+                    auditLog.IsDeleted = true;
+                    auditLog.DeletedAt = currentUtcTime;
+                }
+            }
+        }
 
     }
 }
