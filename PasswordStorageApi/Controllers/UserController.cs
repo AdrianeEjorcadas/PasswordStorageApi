@@ -33,7 +33,7 @@ namespace PasswordStorageApi.Controller
         }
 
         [HttpGet("{userId}")]
-        public async Task<ActionResult<UserModel>> GetUserByIdAsync(int userId)
+        public async Task<ActionResult<UserModel>> GetUserByID(int userId)
         {
             try
             {
@@ -54,7 +54,7 @@ namespace PasswordStorageApi.Controller
             try
             {
                 var user = await _userService.CreateAsync(userModel);
-                return CreatedAtAction(nameof(GetUserByIdAsync), new { userId = user.UserId }, user);
+                return CreatedAtAction(nameof(GetUserByID), new { userId = user.UserId }, user);
             }
             catch (Exception ex)
             {
