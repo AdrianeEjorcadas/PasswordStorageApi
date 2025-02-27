@@ -11,10 +11,10 @@ namespace PasswordStorageApi.Models
         [Required]
         [DataType(DataType.EmailAddress, ErrorMessage = "Not a valid email address")]
         [StringLength(100, ErrorMessage = "UserName cannot be longer than 100 characters")]
-        public string? UserName { get; set; }
+        public string UserName { get; set; }
 
-        public bool IsActive { get; set; }
-        public bool IsVerified { get; set; }
+        public bool? IsActive { get; set; }
+        public bool? IsVerified { get; set; }
         public bool IsDeleted { get; set; }
 
         [DataType(DataType.DateTime)]

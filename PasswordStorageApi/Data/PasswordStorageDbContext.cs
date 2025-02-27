@@ -31,6 +31,7 @@ namespace PasswordStorageApi.Data
         {
             CreatedAt();
             UpdatedAt();
+            DeletedAt();
             return base.SaveChanges();
         }
 
@@ -39,6 +40,7 @@ namespace PasswordStorageApi.Data
         {
             CreatedAt();
             UpdatedAt();
+            DeletedAt();
             return base.SaveChangesAsync(cancellationToken);
         }
 
@@ -105,7 +107,7 @@ namespace PasswordStorageApi.Data
         public void DeletedAt()
         {
             var entries = ChangeTracker.Entries()
-                .Where(e => e.State != EntityState.Deleted);
+                .Where(e => e.State == EntityState.Deleted);
 
             // Get the current UTC time
             DateTime currentUtcTime = DateTime.UtcNow;

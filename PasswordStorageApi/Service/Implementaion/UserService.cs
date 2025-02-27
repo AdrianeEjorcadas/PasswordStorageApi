@@ -12,29 +12,29 @@ namespace PasswordStorageApi.Service.Implementaion
         {
             _userRepository = userRepository;
         }
-        public Task<UserModel> CreateAsync(UserModel model)
+        public async Task<UserModel> CreateAsync(UserModel model)
+        {
+            return await _userRepository.CreateAsync(model);
+        }
+
+        public async Task<UserModel?> DeleteAsync(int userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<UserModel> DeleteAsync(int userId)
+        public async Task<IEnumerable<UserModel?>> GetAsync()
         {
-            throw new NotImplementedException();
+            return await _userRepository.GetAsync();
         }
 
-        public Task<UserModel> GetAsync()
+        public async Task<UserModel?> GetUserByIdAsync(int userId)
         {
-            throw new NotImplementedException();
+            return await _userRepository.GetUserByIdAsync(userId);
         }
 
-        public Task<UserModel> GetUserByIdAsync(int id)
+        public async Task<UserModel?> UpdateAsync(int userId, UserModel model)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<UserModel> UpdateAsync(int userId, UserModel model)
-        {
-            throw new NotImplementedException();
+            return await _userRepository.UpdateAsync(userId, model);
         }
     }
 }

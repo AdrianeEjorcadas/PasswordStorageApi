@@ -22,9 +22,9 @@ namespace PasswordStorageApi.Controllers
             try
             {
                 var platforms = await _platformService.GetAllPlatforms();
-                if(platforms == null)
+                if(!platforms.Any())
                 {
-                    return NotFound();
+                    return NotFound("No platform found !");
                 }
                 return Ok(platforms);
             }
@@ -60,7 +60,7 @@ namespace PasswordStorageApi.Controllers
             try
             {
                 var newPlatform = await _platformService.AddPlatform(platform);
-                return CreatedAtAction(nameof(GetPlatformById), new { platformId = platform.PlatformId }, platform);
+                return CreatedAtAction(nameof(GetPlatformById), new { platformId = newPlatform.PlatformId }, newPlatform);
             }
             catch (HttpRequestException ex)
             {
@@ -82,7 +82,7 @@ namespace PasswordStorageApi.Controllers
                 if (updatedPlatform == null)
                     return NotFound("Platform does not exist!");
 
-                return CreatedAtAction(nameof(GetPlatformById), new { platformId = platform.PlatformId }, platform);
+                return CreatedAtAction(nameof(GetPlatformById), new { platformId = updatedPlatform.PlatformId }, updatedPlatform);
             }
             catch (HttpRequestException ex)
             {
@@ -94,7 +94,7 @@ namespace PasswordStorageApi.Controllers
             }
         }
 
-        [HttpPut("DeletePlatform/{platformId}")]
+        [HttpDelete("DeletePlatform/{platformId}")]
         public async Task<ActionResult<PlatformModel>> DeletePlatform(int platformId)
         {
             try
