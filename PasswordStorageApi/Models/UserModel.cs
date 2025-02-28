@@ -13,7 +13,7 @@ namespace PasswordStorageApi.Models
         [StringLength(100, ErrorMessage = "UserName cannot be longer than 100 characters")]
         public string UserName { get; set; }
 
-        public bool? IsActive { get; set; }
+        public bool IsActive { get; set; }
         public bool? IsVerified { get; set; }
         public bool IsDeleted { get; set; }
 

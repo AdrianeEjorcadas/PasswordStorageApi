@@ -19,7 +19,7 @@ namespace PasswordStorageApi.Service.Implementaion
 
         public async Task<UserModel?> DeleteAsync(int userId)
         {
-            throw new NotImplementedException();
+            return await _userRepository.DeleteAsync(userId);
         }
 
         public async Task<IEnumerable<UserModel?>> GetAsync()
@@ -35,6 +35,11 @@ namespace PasswordStorageApi.Service.Implementaion
         public async Task<UserModel?> UpdateAsync(int userId, UserModel model)
         {
             return await _userRepository.UpdateAsync(userId, model);
+        }
+
+        public async Task<UserModel> UpdateUserStatusAsync(int userId)
+        {
+            return await _userRepository.UpdateUserStatusAsync(userId);
         }
     }
 }

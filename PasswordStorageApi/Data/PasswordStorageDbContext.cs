@@ -31,7 +31,7 @@ namespace PasswordStorageApi.Data
         {
             CreatedAt();
             UpdatedAt();
-            DeletedAt();
+            //DeletedAt();
             return base.SaveChanges();
         }
 
@@ -40,7 +40,7 @@ namespace PasswordStorageApi.Data
         {
             CreatedAt();
             UpdatedAt();
-            DeletedAt();
+            //DeletedAt();
             return base.SaveChangesAsync(cancellationToken);
         }
 
@@ -70,6 +70,7 @@ namespace PasswordStorageApi.Data
                 {
                     user.CreatedAt = currentUtcTime;
                     user.IsDeleted = false;
+                    user.IsActive = true;
                 }
                 else if(entry.Entity is AuditLogModel auditLog)
                 {
@@ -104,40 +105,40 @@ namespace PasswordStorageApi.Data
         }
 
         // Set the DeletedAt property for the entities
-        public void DeletedAt()
-        {
-            var entries = ChangeTracker.Entries()
-                .Where(e => e.State == EntityState.Deleted);
+        //public void DeletedAt()
+        //{
+        //    var entries = ChangeTracker.Entries()
+        //        .Where(e => e.State == EntityState.Deleted);
 
-            // Get the current UTC time
-            DateTime currentUtcTime = DateTime.UtcNow;
+        //    // Get the current UTC time
+        //    DateTime currentUtcTime = DateTime.UtcNow;
 
-            foreach(var entry in entries)
-            {
-                entry.State = EntityState.Modified;
+        //    foreach(var entry in entries)
+        //    {
+        //        entry.State = EntityState.Modified;
 
-                if(entry.Entity is UserModel user)
-                {
-                    user.IsDeleted = true;
-                    user.DeletedAt = currentUtcTime;
-                }
-                else if (entry.Entity is PlatformModel platform)
-                {
-                    platform.IsDeleted = true;
-                    platform.DeletedAt = currentUtcTime;
-                }
-                else if(entry.Entity is PasswordModel password)
-                {
-                    password.IsDeleted = true;
-                    password.DeletedAt = currentUtcTime;
-                } 
-                else if(entry.Entity is AuditLogModel auditLog)
-                {
-                    auditLog.IsDeleted = true;
-                    auditLog.DeletedAt = currentUtcTime;
-                }
-            }
-        }
+        //        if(entry.Entity is UserModel user)
+        //        {
+        //            //user.IsDeleted = true;
+        //            user.DeletedAt = currentUtcTime;
+        //        }
+        //        else if (entry.Entity is PlatformModel platform)
+        //        {
+        //            //platform.IsDeleted = true;
+        //            platform.DeletedAt = currentUtcTime;
+        //        }
+        //        else if(entry.Entity is PasswordModel password)
+        //        {
+        //            //password.IsDeleted = true;
+        //            password.DeletedAt = currentUtcTime;
+        //        } 
+        //        else if(entry.Entity is AuditLogModel auditLog)
+        //        {
+        //            //auditLog.IsDeleted = true;
+        //            auditLog.DeletedAt = currentUtcTime;
+        //        }
+        //    }
+        //}
 
     }
 }

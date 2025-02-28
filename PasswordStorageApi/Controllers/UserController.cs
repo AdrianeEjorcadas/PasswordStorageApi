@@ -80,5 +80,42 @@ namespace PasswordStorageApi.Controller
             }
         }
 
+        [HttpPut("activation-status-user/{userId}")]
+        public async Task<ActionResult> UpdateUserStatusAsync(int userId)
+        {
+            try
+            {
+                var user = await _userService.UpdateUserStatusAsync(userId);
+                //return RedirectToAction(nameof(GetUserByID), new { userId = user.UserId}); return 302 status / redirect
+                return Ok(user); // return 200 status
+            }
+            catch (NullReferenceException nex)
+            {
+                return BadRequest(nex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+
+        [HttpDelete("delete-user/{userId}")]
+        public async Task<ActionResult<UserModel>> DeleteAsync(int userId)
+        {
+            try
+            {
+                var deletedUser = await _userService.DeleteAsync(userId);
+                return Ok();
+            }
+            catch (NullReferenceException nex)
+            {
+                return NotFound("user does not exist!");
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
     }
 }

@@ -9,5 +9,6 @@ namespace PasswordStorageApi.Repository.Interface
         Task<UserModel> CreateAsync(UserModel model);
         Task<UserModel?> UpdateAsync(int userId, UserModel model);
         Task<UserModel?> DeleteAsync(int userId);
+        Task<UserModel> UpdateUserStatusAsync(int userId);
     }
 }
