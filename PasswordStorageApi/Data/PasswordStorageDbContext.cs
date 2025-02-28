@@ -23,7 +23,7 @@ namespace PasswordStorageApi.Data
             modelBuilder.Entity<UserModel>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<PlatformModel>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<PasswordModel>().HasQueryFilter(e => !e.IsDeleted);
-            modelBuilder.Entity<AuditLogModel>().HasQueryFilter(e => !e.IsDeleted);
+            //modelBuilder.Entity<AuditLogModel>().HasQueryFilter(e => !e.IsDeleted);
         }
 
         // Override SaveChanges to call CreatedAt(), UpdatedAt(), and DeletedAt() method
@@ -75,8 +75,8 @@ namespace PasswordStorageApi.Data
                 else if(entry.Entity is AuditLogModel auditLog)
                 {
                     auditLog.CreatedAt = currentUtcTime;
-                    auditLog.UnixTimeStamp = ((DateTimeOffset)currentUtcTime).ToUnixTimeSeconds();
-                    auditLog.IsDeleted = false;
+                    auditLog.TimeStamp = ((DateTimeOffset)currentUtcTime).ToUnixTimeSeconds();
+                    //auditLog.IsDeleted = false;
                 }
             }
         }

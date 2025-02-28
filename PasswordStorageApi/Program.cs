@@ -5,7 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using PasswordStorageApi.Repository.Interface;
 using PasswordStorageApi.Repository.Implementation;
 using PasswordStorageApi.Service.Interface;
-using PasswordStorageApi.Service.Implementaion; // Add this using directive
+using PasswordStorageApi.Service.Implementaion;
+using PasswordStorageApi.Service.Logging; // Add this using directive
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 //add service
 builder.Services.AddScoped<IPlatformService, PlatformService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ILogger, DatabaseLogger>(); // logger
 
 //Add CORS - since i am getting an Httpconnectivity error
 builder.Services.AddCors(options =>

@@ -10,32 +10,29 @@ namespace PasswordStorageApi.Models
         public int LogId { get; set; }
 
         [Required]
-        [ForeignKey("UserId")]
-        public int UserId { get; set; }
+        public long TimeStamp { get; set; }
+
+        [Required]
+        public string LogLevel { get; set; }
 
         [Required]
         [StringLength(50)]
         public string Action { get; set; }
 
         [Required]
-        public long UnixTimeStamp { get; set; }
+        public string Message { get; set; }
 
-        [Required]
+        public string Exception { get; set; }
+
         [StringLength(50)]
         public string IpAddress { get; set; }
-
-        public bool IsArchived { get; set; }
-        public bool IsDeleted { get; set; }
 
         [DataType(DataType.DateTime)]
         public DateTime CreatedAt { get; set; }
 
-        [DataType(DataType.DateTime)]
-        public DateTime? DeletedAt { get; set; }
-
-
-        //Navigation property
-        public UserModel User { get; set; }
+        [Required]
+        [StringLength(50)]
+        public string UserName { get; set; }
 
     }
 }
