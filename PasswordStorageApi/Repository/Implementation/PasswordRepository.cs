@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PasswordStorageApi.Data;
+using PasswordStorageApi.DTO;
 using PasswordStorageApi.Models;
 using PasswordStorageApi.Repository.Interface;
 using PasswordStorageApi.Service.Logging;
@@ -9,10 +10,8 @@ namespace PasswordStorageApi.Repository.Implementation
     public class PasswordRepository : IPasswordRepository
     {
         private readonly PasswordStorageDbContext _context;
-        private readonly DatabaseLogger _logger;
-        public PasswordRepository(DatabaseLogger logger,  PasswordStorageDbContext context)
+        public PasswordRepository(PasswordStorageDbContext context)
         {
-            _logger = logger;
             _context = context;
         }
 
@@ -28,11 +27,10 @@ namespace PasswordStorageApi.Repository.Implementation
             return passwordToUpdate.IsActive;
         }
 
-        public async Task<PasswordModel> CreateAsync(PasswordModel password)
+        public async Task<PasswordModel> CreateAsync(PasswordInputModel passwordInputModel, 
+                                                        string encyptedPassword, byte[] salt)
         {
-            await _context.Passwords.AddAsync(password);
-            await _context.SaveChangesAsync();
-            return password;
+          throw new NotImplementedException();
         }
 
         public async Task<PasswordModel> DeletePasswordAsync(int passwordId)

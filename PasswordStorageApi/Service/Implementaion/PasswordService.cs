@@ -1,18 +1,28 @@
-﻿using PasswordStorageApi.Models;
+﻿using PasswordStorageApi.DTO;
+using PasswordStorageApi.Helpers;
+using PasswordStorageApi.Models;
+using PasswordStorageApi.Repository.Interface;
 using PasswordStorageApi.Service.Interface;
 
 namespace PasswordStorageApi.Service.Implementaion
 {
     public class PasswordService : IPasswordService
     {
+        private readonly IPasswordRepository _passwordRepository;
+        public PasswordService(IPasswordRepository passwordRepository)
+        {
+            _passwordRepository = passwordRepository;
+        }
         public Task<bool> ChangePassworStatusdAsync(int passwordId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<PasswordModel> CreateAsync(int platformId, PasswordModel password)
+        public async Task<PasswordModel> CreateAsync(PasswordInputModel passwordInput)
         {
-            throw new NotImplementedException();
+            var salt = SaltHelper.GenerateSalt(16);
+            string encryptedPassword = EncryptionHelper.Encrypt(passwordInput.PlainTextPassword, salt);
+            return await _passwordRepository.CreateAsync(passwordInput, encryptedPassword, salt);
         }
 
         public Task<PasswordModel> DeletePasswordAsync(int passwordId)

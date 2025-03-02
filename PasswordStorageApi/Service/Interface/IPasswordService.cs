@@ -1,11 +1,12 @@
-﻿using PasswordStorageApi.Models;
+﻿using PasswordStorageApi.DTO;
+using PasswordStorageApi.Models;
 
 namespace PasswordStorageApi.Service.Interface
 {
     public interface IPasswordService
     {
         //Create password for specific platform
-        Task<PasswordModel> CreateAsync(int platformId, PasswordModel password);
+        Task<PasswordModel> CreateAsync(PasswordInputModel passwordInput);
 
         // Get all users' password: both active and inactive; exclude deleted password
         Task<PasswordModel?> GetAllPasswordAsync(int userId);

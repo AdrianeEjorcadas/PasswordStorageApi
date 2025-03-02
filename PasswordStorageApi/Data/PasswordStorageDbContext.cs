@@ -35,7 +35,7 @@ namespace PasswordStorageApi.Data
             return base.SaveChanges();
         }
 
-        // Override SaveChangesAsync to call CreatedAt(), UpdatedAt(), and DeletedAt() method
+        // Override SaveChangesAsync to call CreatedAt(), UpdatedAt()
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             CreatedAt();
