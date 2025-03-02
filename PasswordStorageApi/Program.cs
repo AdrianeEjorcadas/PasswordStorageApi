@@ -30,7 +30,8 @@ builder.Services.AddScoped<IPasswordRepository, PasswordRepository>();
 builder.Services.AddScoped<IPlatformService, PlatformService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
-builder.Services.AddScoped<ILogger, DatabaseLogger>(); // logger
+// logger
+builder.Services.AddSingleton<ILogger, DatabaseLogger>(); 
 
 //Add CORS - since i am getting an Httpconnectivity error
 builder.Services.AddCors(options =>

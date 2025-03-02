@@ -26,6 +26,7 @@ namespace PasswordStorageApi.Models
         public bool IsActive { get; set; }
 
         public bool IsDeleted { get; set; }
+        public bool IsExpired { get; set; }
 
         [DataType(DataType.DateTime)]
         public DateTime? LastUsedAt { get; set; }

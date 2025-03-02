@@ -1,51 +1,88 @@
-﻿using PasswordStorageApi.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using PasswordStorageApi.Data;
+using PasswordStorageApi.Models;
 using PasswordStorageApi.Repository.Interface;
+using PasswordStorageApi.Service.Logging;
 
 namespace PasswordStorageApi.Repository.Implementation
 {
     public class PasswordRepository : IPasswordRepository
     {
-        public Task<bool> ChangePassworStatusdAsync(int passwordId)
+        private readonly PasswordStorageDbContext _context;
+        private readonly DatabaseLogger _logger;
+        public PasswordRepository(DatabaseLogger logger,  PasswordStorageDbContext context)
         {
-            throw new NotImplementedException();
+            _logger = logger;
+            _context = context;
         }
 
-        public Task<PasswordModel> CreateAsync(int platformId, PasswordModel password)
+        public async Task<bool> ChangePassworStatusdAsync(int passwordId)
         {
-            throw new NotImplementedException();
+            var passwordToUpdate = await _context.Passwords
+                .Where(e => e.PasswordId == passwordId)
+                .FirstOrDefaultAsync();
+
+            passwordToUpdate.IsActive = !passwordToUpdate.IsActive;
+            await _context.SaveChangesAsync();
+
+            return passwordToUpdate.IsActive;
         }
 
-        public Task<PasswordModel> DeletePasswordAsync(int passwordId)
+        public async Task<PasswordModel> CreateAsync(PasswordModel password)
         {
-            throw new NotImplementedException();
+            await _context.Passwords.AddAsync(password);
+            await _context.SaveChangesAsync();
+            return password;
         }
 
-        public Task<PasswordModel?> GetActivePasswordAsync(int userId)
+        public async Task<PasswordModel> DeletePasswordAsync(int passwordId)
         {
-            throw new NotImplementedException();
+            var passwordToDelete = await _context.Passwords
+                .Where(e => e.PasswordId == passwordId)
+                .FirstOrDefaultAsync();
+
+            passwordToDelete.IsDeleted = true;
+            await _context.SaveChangesAsync();
+
+            return passwordToDelete;
         }
 
-        public Task<PasswordModel?> GetAllPasswordAsync(int userId)
+        public async Task<IEnumerable<PasswordModel?>> GetActivePasswordAsync(int userId)
         {
-            throw new NotImplementedException();
+            return await _context.Passwords
+                .Where (e => e.UserId == userId && e.IsActive)
+                .ToListAsync();
         }
 
-        public Task<PasswordModel?> GetInactivePasswordAsync(int userId)
+        public async Task<IEnumerable<PasswordModel?>> GetAllPasswordAsync(int userId)
         {
-            throw new NotImplementedException();
+            return await _context.Passwords
+                .Where(e => e.UserId == userId && !e.IsExpired)
+                .ToListAsync();
         }
 
-        public Task<PasswordModel?> GetPasswordByPlatformAsync(int userId, int platformId)
+        public async Task<IEnumerable<PasswordModel?>> GetInactivePasswordAsync(int userId)
         {
-            throw new NotImplementedException();
+            return await _context.Passwords
+                .Where(e => e.UserId == userId && !e.IsActive)
+                .ToListAsync();
         }
 
-        public Task<PasswordModel> GetPasswordHistoryAsync(int userId)
+        public async Task<IEnumerable<PasswordModel?>> GetPasswordByPlatformAsync(int userId, int platformId)
         {
-            throw new NotImplementedException();
+            return await _context.Passwords
+                .Where(e => e.UserId == userId && e.PlatformId == platformId)
+                .ToListAsync();
         }
 
-        public Task<PasswordModel> UpdatePasswordAsync(int passwordId, PasswordModel password)
+        public async Task<IEnumerable<PasswordModel>> GetPasswordHistoryAsync(int userId)
+        {
+            return await _context.Passwords
+                .Where(e => e.UserId == userId)
+                .ToListAsync();
+        }
+
+        public async Task<PasswordModel> UpdatePasswordAsync(int passwordId, PasswordModel password)
         {
             throw new NotImplementedException();
         }

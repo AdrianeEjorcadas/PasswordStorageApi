@@ -65,6 +65,7 @@ namespace PasswordStorageApi.Data
                 {
                     password.CreatedAt = currentUtcTime;
                     password.IsDeleted = false;
+                    password.IsExpired = false;
                 }
                 else if (entry.Entity is UserModel user)
                 {
