@@ -23,8 +23,8 @@ namespace PasswordStorageApi.Models
         [Required]
         public string Salt { get; set; }
 
-        public bool IsCurrent { get; set; }
-        //public bool IsCompromised { get; set; }
+        public bool IsActive { get; set; }
+
         public bool IsDeleted { get; set; }
 
         [DataType(DataType.DateTime)]
