@@ -74,6 +74,7 @@ namespace PasswordStorageApi.Repository.Implementation
         {
             return await _context.Passwords
                 .Where(e => e.UserId == userId && e.PlatformId == platformId)
+                .Include(p => p.Platform)
                 .ToListAsync();
         }
 

@@ -38,25 +38,52 @@ namespace PasswordStorageApi.Service.Implementaion
         {
             throw new NotImplementedException();
         }
+      
+        public async Task<IEnumerable<PasswordModel?>> GetAllPasswordAsync(int userId)
+        {
+            var passwords = await _passwordRepository.GetAllPasswordAsync(userId);
+
+            foreach(var password in passwords)
+            {
+                password.EncryptedPassword = EncryptionHelper.Decrypt(password.EncryptedPassword);
+            }
+            return passwords;
+        }
 
         public async Task<IEnumerable<PasswordModel?>> GetActivePasswordAsync(int userId)
         {
-            return await _passwordRepository.GetActivePasswordAsync(userId);
+            var activePasswords = await _passwordRepository.GetActivePasswordAsync(userId);
+
+            foreach (var password in activePasswords) 
+            {
+                password.EncryptedPassword = EncryptionHelper.Decrypt(password.EncryptedPassword);
+            }
+
+            return activePasswords;
+
         }
 
-        public async Task<IEnumerable<PasswordModel?>> GetAllPasswordAsync(int userId)
+        public async Task<IEnumerable<PasswordModel?>> GetInactivePasswordAsync(int userId)
         {
-            return await _passwordRepository.GetAllPasswordAsync(userId);
+            var inactivePasswords = await _passwordRepository.GetInactivePasswordAsync(userId);
+
+            foreach(var password in inactivePasswords)
+            {
+                password.EncryptedPassword = EncryptionHelper.Decrypt(password.EncryptedPassword);
+            }
+
+            return inactivePasswords;
         }
 
-        public Task<IEnumerable<PasswordModel?>> GetInactivePasswordAsync(int userId)
+        public async Task<IEnumerable<PasswordModel?>> GetPasswordByPlatformAsync(int userId, int platformId)
         {
-            throw new NotImplementedException();
-        }
+            var passwords = await _passwordRepository.GetPasswordByPlatformAsync(userId, platformId);
 
-        public Task<IEnumerable<PasswordModel?>> GetPasswordByPlatformAsync(int userId, int platformId)
-        {
-            throw new NotImplementedException();
+            foreach(var password in passwords)
+            {
+                password.EncryptedPassword = EncryptionHelper.Decrypt(password.EncryptedPassword);
+            }
+            return passwords;
         }
 
         public Task<IEnumerable<PasswordModel>> GetPasswordHistoryAsync(int userId)
@@ -68,5 +95,6 @@ namespace PasswordStorageApi.Service.Implementaion
         {
             throw new NotImplementedException();
         }
+
     }
 }

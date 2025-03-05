@@ -16,7 +16,7 @@ namespace PasswordStorageApi.Controllers
         }
 
         [HttpPost("add-password")]
-        public async Task<ActionResult<PasswordModel>> CreateAsync(PasswordInputModel passwordInput)
+        public async Task<ActionResult<PasswordModel>> CreateAsync([FromBody]PasswordInputModel passwordInput)
         {
             try
             {
@@ -32,7 +32,7 @@ namespace PasswordStorageApi.Controllers
             }
         }
 
-        [HttpGet("user-passwords/{userId}")]
+        [HttpGet("user-passwords/{userId:int}")]
         public async Task<ActionResult<IEnumerable<PasswordModel>>> GetAllPasswordAsync(int userId)
         {
             try
@@ -50,8 +50,8 @@ namespace PasswordStorageApi.Controllers
             }
         }
 
-        [HttpGet("active-passwords/{userId}")]
-        public async Task<ActionResult<IEnumerable<PasswordModel>>> GetActivePasswordAsync(int userId) 
+        [HttpGet("active-passwords/{userId:int}")]
+        public async Task<ActionResult<IEnumerable<PasswordModel?>>> GetActivePasswordAsync(int userId) 
         {
             try
             {
@@ -64,6 +64,40 @@ namespace PasswordStorageApi.Controllers
             {
                 return BadRequest(new { Message = ex.Message });
             }
-        } 
+        }
+
+        [HttpGet("inactive-passwords/{userId:int}")]
+        public async Task<ActionResult<IEnumerable<PasswordModel?>>> GetInactivePasswordAsync(int userId)
+        {
+            try
+            {
+                var inactivePasswords = await _passwordService.GetInactivePasswordAsync(userId);
+                return Ok(inactivePasswords);
+            } catch (NullReferenceException nex)
+            {
+                return NotFound("No inactive password found!");
+            } catch(Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        [HttpGet("platform-passwords/{userId:int}/{platformId:int}")]
+        public async Task<ActionResult<IEnumerable<PasswordModel?>>> GetPasswordByPlatform(int userId,  int platformId)
+        {
+            try
+            {
+                var passwords = await _passwordService.GetPasswordByPlatformAsync(userId, platformId);
+                return Ok(passwords);
+            }
+            catch (NullReferenceException nex) 
+            {
+                return NotFound("No password found!");
+            } catch(Exception ex)
+            {
+                return BadRequest(new { Message =  $"{ex.Message}" });
+            }
+        }
+
     }
 }
