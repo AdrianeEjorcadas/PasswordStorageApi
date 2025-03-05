@@ -50,6 +50,7 @@ namespace PasswordStorageApi.Repository.Implementation
         {
             return await _context.Passwords
                 .Where (e => e.UserId == userId && e.IsActive)
+                .Include(p => p.Platform)
                 .ToListAsync();
         }
 
@@ -57,6 +58,7 @@ namespace PasswordStorageApi.Repository.Implementation
         {
             return await _context.Passwords
                 .Where(e => e.UserId == userId && !e.IsExpired)
+                .Include(p => p.Platform)
                 .ToListAsync();
         }
 
@@ -64,6 +66,7 @@ namespace PasswordStorageApi.Repository.Implementation
         {
             return await _context.Passwords
                 .Where(e => e.UserId == userId && !e.IsActive)
+                .Include(p => p.Platform)
                 .ToListAsync();
         }
 

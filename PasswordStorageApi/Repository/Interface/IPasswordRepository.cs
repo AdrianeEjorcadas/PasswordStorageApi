@@ -8,7 +8,7 @@ namespace PasswordStorageApi.Repository.Interface
         //Create password for specific platform
         Task<PasswordModel> CreateAsync(PasswordModel passwordModel);
 
-        // Get all users' password: both active and inactive; exclude deleted and expired password 
+        // Get all of specific users' password for all platform: both active and inactive; exclude deleted and expired password 
         Task<IEnumerable<PasswordModel?>> GetAllPasswordAsync(int userId);
 
         // Get all active password

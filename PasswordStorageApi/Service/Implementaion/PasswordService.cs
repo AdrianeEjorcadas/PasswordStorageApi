@@ -39,27 +39,27 @@ namespace PasswordStorageApi.Service.Implementaion
             throw new NotImplementedException();
         }
 
-        public Task<PasswordModel?> GetActivePasswordAsync(int userId)
+        public async Task<IEnumerable<PasswordModel?>> GetActivePasswordAsync(int userId)
+        {
+            return await _passwordRepository.GetActivePasswordAsync(userId);
+        }
+
+        public async Task<IEnumerable<PasswordModel?>> GetAllPasswordAsync(int userId)
+        {
+            return await _passwordRepository.GetAllPasswordAsync(userId);
+        }
+
+        public Task<IEnumerable<PasswordModel?>> GetInactivePasswordAsync(int userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<PasswordModel?> GetAllPasswordAsync(int userId)
+        public Task<IEnumerable<PasswordModel?>> GetPasswordByPlatformAsync(int userId, int platformId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<PasswordModel?> GetInactivePasswordAsync(int userId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<PasswordModel?> GetPasswordByPlatformAsync(int userId, int platformId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<PasswordModel> GetPasswordHistoryAsync(int userId)
+        public Task<IEnumerable<PasswordModel>> GetPasswordHistoryAsync(int userId)
         {
             throw new NotImplementedException();
         }

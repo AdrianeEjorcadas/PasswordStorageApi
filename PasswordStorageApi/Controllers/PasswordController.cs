@@ -32,5 +32,38 @@ namespace PasswordStorageApi.Controllers
             }
         }
 
+        [HttpGet("user-passwords/{userId}")]
+        public async Task<ActionResult<IEnumerable<PasswordModel>>> GetAllPasswordAsync(int userId)
+        {
+            try
+            {
+                var passwords = await _passwordService.GetAllPasswordAsync(userId);
+                return Ok(passwords);
+            }
+            catch (NullReferenceException nuex)
+            {
+                return NotFound("No passwords exist!");
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest(new {Message =  ex.Message});
+            }
+        }
+
+        [HttpGet("active-passwords/{userId}")]
+        public async Task<ActionResult<IEnumerable<PasswordModel>>> GetActivePasswordAsync(int userId) 
+        {
+            try
+            {
+                var activePasswords = await _passwordService.GetActivePasswordAsync(userId);
+                return Ok(activePasswords);
+            } catch(NullReferenceException nex)
+            {
+                return NotFound("No active password found!");
+            } catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        } 
     }
 }
