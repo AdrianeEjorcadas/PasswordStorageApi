@@ -27,10 +27,11 @@ namespace PasswordStorageApi.Repository.Implementation
             return passwordToUpdate.IsActive;
         }
 
-        public async Task<PasswordModel> CreateAsync(PasswordInputModel passwordInputModel, 
-                                                        string encyptedPassword, byte[] salt)
+        public async Task<PasswordModel> CreateAsync(PasswordModel passwordModel)
         {
-          throw new NotImplementedException();
+            await _context.Passwords.AddAsync(passwordModel);
+            await _context.SaveChangesAsync();
+            return passwordModel;
         }
 
         public async Task<PasswordModel> DeletePasswordAsync(int passwordId)

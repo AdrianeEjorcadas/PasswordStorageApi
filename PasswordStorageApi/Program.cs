@@ -6,7 +6,9 @@ using PasswordStorageApi.Repository.Interface;
 using PasswordStorageApi.Repository.Implementation;
 using PasswordStorageApi.Service.Interface;
 using PasswordStorageApi.Service.Implementaion;
-using PasswordStorageApi.Service.Logging; // Add this using directive
+using PasswordStorageApi.Service.Logging;
+using PasswordStorageApi.Configuration;
+using PasswordStorageApi.Helpers; // Add this using directive
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +44,10 @@ builder.Services.AddCors(options =>
                           .AllowAnyHeader());
 });
 
+//Add config reader
+//builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+//builder.Services.AddSingleton<EncryptionHelper>();
+
 // Add Swagger services
 builder.Services.AddSwaggerGen(c => // Change builder.AddSwaggerGen to builder.Services.AddSwaggerGen
 {
@@ -74,4 +80,19 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Load the encryption key from the configuration
+//LoadEncryptionKey(builder.Configuration);
+
+// Resolve the EncryptionHelper to use in your application
+//var encryptionHelper = app.Services.GetRequiredService<EncryptionHelper>();
+//// Use the encryption key
+//encryptionHelper.
+
 app.Run();
+
+// Method to load the encryption key
+//static void LoadEncryptionKey(IConfiguration configuration)
+//{
+//    var encryptionKey = configuration.GetSection("AppSettings")["EncryptionKey"];
+//    EncryptionHelper.SetEncryptionKey(encryptionKey);
+//}

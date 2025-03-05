@@ -6,8 +6,16 @@ namespace PasswordStorageApi.Helpers
     public class EncryptionHelper
     {
 
-        private static readonly byte[] key = Encoding.UTF8.GetBytes("your-32-char-key-here");
 
+        //private static string _encryptionKey;
+        //internal static void SetEncryptionKey(string? encryptionKey)
+        //{
+        //    _encryptionKey = encryptionKey ?? string.Empty;
+        //}
+
+        // get data from config file
+        private static readonly byte[] key = Encoding.UTF8.GetBytes("3Vu5N8tXn!aZ$pEc@r7Fh1B2j#L*^1qM");
+        
         public static string Encrypt(string plainText, byte[] salt)
         {
             using (Aes aesAlg = Aes.Create())
@@ -63,5 +71,6 @@ namespace PasswordStorageApi.Helpers
                 }
             }
         }
+
     }
 }

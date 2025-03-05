@@ -22,7 +22,16 @@ namespace PasswordStorageApi.Service.Implementaion
         {
             var salt = SaltHelper.GenerateSalt(16);
             string encryptedPassword = EncryptionHelper.Encrypt(passwordInput.PlainTextPassword, salt);
-            return await _passwordRepository.CreateAsync(passwordInput, encryptedPassword, salt);
+
+            var passwordModel = new PasswordModel
+            {
+                UserId = passwordInput.UserId,
+                PlatformId = passwordInput.PlatformId,
+                EncryptedPassword = encryptedPassword,
+                Salt = Convert.ToBase64String(salt)
+            };
+
+            return await _passwordRepository.CreateAsync(passwordModel);
         }
 
         public Task<PasswordModel> DeletePasswordAsync(int passwordId)

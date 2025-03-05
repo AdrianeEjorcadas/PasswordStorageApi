@@ -6,7 +6,7 @@ namespace PasswordStorageApi.Repository.Interface
     public interface IPasswordRepository
     {
         //Create password for specific platform
-        Task<PasswordModel> CreateAsync(PasswordInputModel passwordInputModel, string encyptedPassword, byte[] salt);
+        Task<PasswordModel> CreateAsync(PasswordModel passwordModel);
 
         // Get all users' password: both active and inactive; exclude deleted and expired password 
         Task<IEnumerable<PasswordModel?>> GetAllPasswordAsync(int userId);
