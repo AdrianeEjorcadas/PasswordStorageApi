@@ -18,7 +18,7 @@ namespace PasswordStorageApi.Service.Implementaion
             throw new NotImplementedException();
         }
 
-        public async Task<PasswordModel> CreateAsync(PasswordInputModel passwordInput)
+        public async Task<PasswordModel> CreateAsync(PasswordInputDTO passwordInput)
         {
             var salt = SaltHelper.GenerateSalt(16);
             string encryptedPassword = EncryptionHelper.Encrypt(passwordInput.PlainTextPassword, salt);
@@ -91,7 +91,7 @@ namespace PasswordStorageApi.Service.Implementaion
             throw new NotImplementedException();
         }
 
-        public Task<PasswordModel> UpdatePasswordAsync(int passwordId, PasswordModel password)
+        public Task<PasswordModel> UpdatePasswordAsync(ChangePasswordDTO changePasswordDTO)
         {
             throw new NotImplementedException();
         }

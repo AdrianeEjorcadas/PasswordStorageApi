@@ -2,7 +2,7 @@
 
 namespace PasswordStorageApi.DTO
 {
-    public class PasswordInputModel
+    public class PasswordInputDTO
     {
         [Required]
         public int UserId { get; set; }

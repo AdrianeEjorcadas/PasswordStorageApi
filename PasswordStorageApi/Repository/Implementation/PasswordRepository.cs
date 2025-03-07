@@ -85,7 +85,7 @@ namespace PasswordStorageApi.Repository.Implementation
                 .ToListAsync();
         }
 
-        public async Task<PasswordModel> UpdatePasswordAsync(int passwordId, PasswordModel password)
+        public Task<PasswordModel> UpdatePasswordAsync(ChangePasswordDTO changePasswordDTO)
         {
             throw new NotImplementedException();
         }

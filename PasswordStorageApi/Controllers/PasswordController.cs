@@ -16,10 +16,13 @@ namespace PasswordStorageApi.Controllers
         }
 
         [HttpPost("add-password")]
-        public async Task<ActionResult<PasswordModel>> CreateAsync([FromBody]PasswordInputModel passwordInput)
+        public async Task<ActionResult<PasswordModel>> CreateAsync([FromBody]PasswordInputDTO passwordInput)
         {
             try
             {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
                 var createdPassword = await _passwordService.CreateAsync(passwordInput);
                 return Ok(createdPassword);
             } catch (NullReferenceException nuex)
@@ -38,11 +41,9 @@ namespace PasswordStorageApi.Controllers
             try
             {
                 var passwords = await _passwordService.GetAllPasswordAsync(userId);
+                if(!passwords.Any())
+                    return NotFound("No password exist!");
                 return Ok(passwords);
-            }
-            catch (NullReferenceException nuex)
-            {
-                return NotFound("No passwords exist!");
             }
             catch (Exception ex) 
             {
@@ -56,11 +57,11 @@ namespace PasswordStorageApi.Controllers
             try
             {
                 var activePasswords = await _passwordService.GetActivePasswordAsync(userId);
+                if (!activePasswords.Any())
+                    return NotFound("No active password found!");
                 return Ok(activePasswords);
-            } catch(NullReferenceException nex)
-            {
-                return NotFound("No active password found!");
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(new { Message = ex.Message });
             }
@@ -72,11 +73,11 @@ namespace PasswordStorageApi.Controllers
             try
             {
                 var inactivePasswords = await _passwordService.GetInactivePasswordAsync(userId);
+                if (!inactivePasswords.Any())
+                    return NotFound("No inactive passwords found");
                 return Ok(inactivePasswords);
-            } catch (NullReferenceException nex)
-            {
-                return NotFound("No inactive password found!");
-            } catch(Exception ex)
+            }
+            catch(Exception ex)
             {
                 return BadRequest(new { Message = ex.Message });
             }
@@ -88,14 +89,30 @@ namespace PasswordStorageApi.Controllers
             try
             {
                 var passwords = await _passwordService.GetPasswordByPlatformAsync(userId, platformId);
+                if (!passwords.Any())
+                    return NotFound("No password found!");
                 return Ok(passwords);
             }
-            catch (NullReferenceException nex) 
-            {
-                return NotFound("No password found!");
-            } catch(Exception ex)
+            catch(Exception ex)
             {
                 return BadRequest(new { Message =  $"{ex.Message}" });
+            }
+        }
+
+        [HttpPut("change-password")]
+        public async Task<ActionResult<PasswordModel>> UpdatePasswordAsync(ChangePasswordDTO changePasswordDTO)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var updatedPassword = await _passwordService.UpdatePasswordAsync(changePasswordDTO);
+                return Ok(updatedPassword);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
             }
         }
 

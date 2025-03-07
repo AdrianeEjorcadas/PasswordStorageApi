@@ -21,7 +21,7 @@ namespace PasswordStorageApi.Repository.Interface
         Task<IEnumerable<PasswordModel?>> GetPasswordByPlatformAsync(int userId, int platformId);
 
         // Update password
-        Task<PasswordModel> UpdatePasswordAsync(int passwordId, PasswordModel password);
+        Task<PasswordModel> UpdatePasswordAsync(ChangePasswordDTO changePasswordDTO);
 
         // Delete password
         Task <PasswordModel> DeletePasswordAsync(int passwordId);

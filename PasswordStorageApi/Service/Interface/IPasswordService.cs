@@ -6,7 +6,7 @@ namespace PasswordStorageApi.Service.Interface
     public interface IPasswordService
     {
         //Create password for specific platform
-        Task<PasswordModel> CreateAsync(PasswordInputModel passwordInput);
+        Task<PasswordModel> CreateAsync(PasswordInputDTO passwordInput);
 
         // Get all users' password: both active and inactive; exclude deleted password
         Task<IEnumerable<PasswordModel?>> GetAllPasswordAsync(int userId);
@@ -21,7 +21,7 @@ namespace PasswordStorageApi.Service.Interface
         Task<IEnumerable<PasswordModel?>> GetPasswordByPlatformAsync(int userId, int platformId);
 
         // Update password
-        Task<PasswordModel> UpdatePasswordAsync(int passwordId, PasswordModel password);
+        Task<PasswordModel> UpdatePasswordAsync(ChangePasswordDTO changePasswordDTO);
 
         // Delete password
         Task<PasswordModel> DeletePasswordAsync(int passwordId);
