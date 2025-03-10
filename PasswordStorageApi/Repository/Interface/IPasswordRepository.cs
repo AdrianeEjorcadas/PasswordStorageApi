@@ -5,6 +5,9 @@ namespace PasswordStorageApi.Repository.Interface
 {
     public interface IPasswordRepository
     {
+        //Get password by using password Id
+        Task<PasswordModel?> GetPasswordbyPwId(int passwordId);
+
         //Create password for specific platform
         Task<PasswordModel> CreateAsync(PasswordModel passwordModel);
 
@@ -21,7 +24,7 @@ namespace PasswordStorageApi.Repository.Interface
         Task<IEnumerable<PasswordModel?>> GetPasswordByPlatformAsync(int userId, int platformId);
 
         // Update password
-        Task<PasswordModel> UpdatePasswordAsync(ChangePasswordDTO changePasswordDTO);
+        Task<PasswordModel> UpdatePasswordAsync(PasswordModel passwordModel, int passwordId);
 
         // Delete password
         Task <PasswordModel> DeletePasswordAsync(int passwordId);

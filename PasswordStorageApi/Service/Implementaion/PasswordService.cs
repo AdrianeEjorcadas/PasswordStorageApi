@@ -86,14 +86,42 @@ namespace PasswordStorageApi.Service.Implementaion
             return passwords;
         }
 
-        public Task<IEnumerable<PasswordModel>> GetPasswordHistoryAsync(int userId)
+        public async Task<IEnumerable<PasswordModel>> GetPasswordHistoryAsync(int userId)
         {
-            throw new NotImplementedException();
+            var passwords = await _passwordRepository.GetPasswordHistoryAsync(userId);
+
+            foreach(var password in passwords)
+            {
+                password.EncryptedPassword = EncryptionHelper.Decrypt(password.EncryptedPassword);
+            }
+            return passwords;
         }
 
-        public Task<PasswordModel> UpdatePasswordAsync(ChangePasswordDTO changePasswordDTO)
+        public async Task<PasswordModel?> UpdatePasswordAsync(ChangePasswordDTO changePasswordDTO)
         {
-            throw new NotImplementedException();
+            var passwordToUpdate = await _passwordRepository.GetPasswordbyPwId(changePasswordDTO.PasswordId);
+
+            if (passwordToUpdate == null)
+                return null;
+
+            var oldPassword = EncryptionHelper.Decrypt(passwordToUpdate.EncryptedPassword);
+            if (oldPassword != changePasswordDTO.OldPassword)
+                throw new ArgumentException("The old password is incorrect.");
+
+            if (!changePasswordDTO.NewPassword.Equals(changePasswordDTO.ConfirmPassword))
+                throw new ArgumentException("New password and confirm password do not match.");
+
+            var newSalt = SaltHelper.GenerateSalt(16);
+            string encryptedNewPassword = EncryptionHelper.Encrypt(changePasswordDTO.NewPassword, newSalt);
+
+            var passwordModel = new PasswordModel
+            {
+                EncryptedPassword = encryptedNewPassword,
+                Salt = Convert.ToBase64String(newSalt),
+            };
+
+            var updatedPassword = await _passwordRepository.UpdatePasswordAsync(passwordModel, changePasswordDTO.PasswordId);
+            return updatedPassword;
         }
 
     }

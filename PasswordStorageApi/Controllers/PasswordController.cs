@@ -99,8 +99,28 @@ namespace PasswordStorageApi.Controllers
             }
         }
 
+        [HttpGet("password-history/{userId:int}")]
+        public async Task<ActionResult<PasswordModel?>> GetPasswordHistoryAsync(int userId) 
+        {
+            try
+            {
+                var passwords = await _passwordService.GetPasswordHistoryAsync(userId);
+                if (!passwords.Any())
+                    return NotFound("No password found");
+                return Ok(passwords);
+            }
+            catch (ArgumentException aex)
+            {
+                return BadRequest(new { Message = aex.Message });
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest($"{ex.Message}");
+            }
+        }
+
         [HttpPut("change-password")]
-        public async Task<ActionResult<PasswordModel>> UpdatePasswordAsync(ChangePasswordDTO changePasswordDTO)
+        public async Task<ActionResult<PasswordModel>> UpdatePasswordAsync([FromBody]ChangePasswordDTO changePasswordDTO)
         {
             try
             {
@@ -108,7 +128,13 @@ namespace PasswordStorageApi.Controllers
                     return BadRequest(ModelState);
 
                 var updatedPassword = await _passwordService.UpdatePasswordAsync(changePasswordDTO);
+                if (updatedPassword is null)
+                    return NotFound("Password does not exist!");
+
                 return Ok(updatedPassword);
+            } catch (ArgumentException argex)
+            {
+                return BadRequest(new { Message = argex.Message }); 
             }
             catch (Exception ex)
             {

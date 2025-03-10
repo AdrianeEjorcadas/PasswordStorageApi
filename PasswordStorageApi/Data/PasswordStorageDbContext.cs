@@ -102,6 +102,10 @@ namespace PasswordStorageApi.Data
                 {
                     platform.UpdatedAt = currentUtcTime;
                 }
+                else if(entry.Entity is PasswordModel password)
+                {
+                    password.UpdatedAt = currentUtcTime;
+                }
             }
         }
 

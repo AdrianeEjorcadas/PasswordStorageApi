@@ -15,6 +15,12 @@ namespace PasswordStorageApi.Repository.Implementation
             _context = context;
         }
 
+        public async Task<PasswordModel?> GetPasswordbyPwId(int passwordId)
+        {
+            return await _context.Passwords
+                .FindAsync(passwordId);
+        }
+
         public async Task<bool> ChangePassworStatusdAsync(int passwordId)
         {
             var passwordToUpdate = await _context.Passwords
@@ -82,12 +88,21 @@ namespace PasswordStorageApi.Repository.Implementation
         {
             return await _context.Passwords
                 .Where(e => e.UserId == userId)
+                .Include(p => p.Platform)
                 .ToListAsync();
         }
 
-        public Task<PasswordModel> UpdatePasswordAsync(ChangePasswordDTO changePasswordDTO)
+        public async Task<PasswordModel> UpdatePasswordAsync(PasswordModel passwordModel, int passwordId)
         {
-            throw new NotImplementedException();
+            var passwordToUpdate = await _context.Passwords
+                .Where(e => e.PasswordId == passwordId)
+                .FirstOrDefaultAsync();
+
+            passwordToUpdate.Salt = passwordModel.Salt;
+            passwordToUpdate.EncryptedPassword = passwordModel.EncryptedPassword;
+
+            await _context.SaveChangesAsync();
+            return passwordToUpdate;
         }
     }
 }
