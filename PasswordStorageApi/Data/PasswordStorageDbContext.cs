@@ -73,12 +73,12 @@ namespace PasswordStorageApi.Data
                     user.IsDeleted = false;
                     user.IsActive = true;
                 }
-                else if(entry.Entity is AuditLogModel auditLog)
-                {
-                    auditLog.CreatedAt = currentUtcTime;
-                    auditLog.TimeStamp = ((DateTimeOffset)currentUtcTime).ToUnixTimeSeconds();
-                    //auditLog.IsDeleted = false;
-                }
+                //else if(entry.Entity is AuditLogModel auditLog)
+                //{
+                //    auditLog.CreatedAt = currentUtcTime;
+                //    //auditLog.TimeStamp = ((DateTimeOffset)currentUtcTime).ToUnixTimeSeconds();
+                //    //auditLog.IsDeleted = false;
+                //}
             }
         }
 

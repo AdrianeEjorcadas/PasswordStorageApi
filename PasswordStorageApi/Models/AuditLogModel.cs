@@ -9,30 +9,28 @@ namespace PasswordStorageApi.Models
         [Required]
         public int LogId { get; set; }
 
-        [Required]
-        public long TimeStamp { get; set; }
+        // Logger category name
+        [StringLength(50)]
+        public string? Category { get; set; }
 
+        // Log message
+        [StringLength(1000)]
+        public string? Message { get; set; }
+
+        // Log level (information, warning, error, etc.)
         [Required]
         public string LogLevel { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        public string Action { get; set; }
+        //Exception details
+        public string? Exception { get; set; }
 
-        [Required]
-        public string Message { get; set; }
-
-        public string Exception { get; set; }
-
-        [StringLength(50)]
-        public string IpAddress { get; set; }
-
+        //Log creation 
         [DataType(DataType.DateTime)]
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        [Required]
-        [StringLength(50)]
-        public string UserName { get; set; }
+        //[Required]
+        //[StringLength(50)]
+        //public string UserName { get; set; }
 
     }
 }

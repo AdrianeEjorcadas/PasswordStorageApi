@@ -33,7 +33,7 @@ builder.Services.AddScoped<IPlatformService, PlatformService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 // logger
-builder.Services.AddSingleton<ILogger, DatabaseLogger>(); 
+//builder.Services.AddSingleton<ILogger, CustomLogger>(); 
 
 //Add CORS - since i am getting an Httpconnectivity error
 builder.Services.AddCors(options =>
@@ -87,6 +87,18 @@ app.MapControllers();
 //var encryptionHelper = app.Services.GetRequiredService<EncryptionHelper>();
 //// Use the encryption key
 //encryptionHelper.
+
+// --- Register the Custom Logger Provider ---
+// Define the file path where logs will be stored.
+string logFilePath = "Logs/logs.txt";
+
+// Retrieve the IServiceScopeFactory from the app's services.
+var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+
+// Add our custom logger provider to the logging factory.
+// You can choose the minimum log level you want (e.g., LogLevel.Information).
+var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
+loggerFactory.AddProvider(new CustomLoggerProvider(logFilePath, LogLevel.Information, scopeFactory));
 
 app.Run();
 

@@ -2,7 +2,7 @@
 
 namespace PasswordStorageApi.Helpers
 {
-    public class SaltHelper
+    public static class SaltHelper
     {
         public static byte[] GenerateSalt(int size)
         {
