@@ -6,9 +6,9 @@ using PasswordStorageApi.Repository.Interface;
 using PasswordStorageApi.Repository.Implementation;
 using PasswordStorageApi.Service.Interface;
 using PasswordStorageApi.Service.Implementaion;
-using PasswordStorageApi.Service.Logging;
 using PasswordStorageApi.Configuration;
-using PasswordStorageApi.Helpers; // Add this using directive
+using PasswordStorageApi.Helpers;
+using PasswordStorageApi.Loggers; // Add this using directive
 
 var builder = WebApplication.CreateBuilder(args);
 

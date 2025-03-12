@@ -13,9 +13,13 @@ namespace PasswordStorageApi.Service.Implementaion
         {
             _passwordRepository = passwordRepository;
         }
-        public Task<bool> ChangePassworStatusdAsync(int passwordId)
+
+        public async Task<bool> ChangePassworStatusdAsync(int passwordId)
         {
-            throw new NotImplementedException();
+            var password = await _passwordRepository.GetPasswordbyPwId(passwordId) 
+                ?? throw new ArgumentException("Password does not exist!");
+
+            return await _passwordRepository.ChangePassworStatusdAsync(passwordId);
         }
 
         public async Task<PasswordModel> CreateAsync(PasswordInputDTO passwordInput)
@@ -34,9 +38,9 @@ namespace PasswordStorageApi.Service.Implementaion
             return await _passwordRepository.CreateAsync(passwordModel);
         }
 
-        public Task<PasswordModel> DeletePasswordAsync(int passwordId)
+        public async Task<PasswordModel> DeletePasswordAsync(int passwordId)
         {
-            throw new NotImplementedException();
+            return await _passwordRepository.DeletePasswordAsync(passwordId);
         }
       
         public async Task<IEnumerable<PasswordModel?>> GetAllPasswordAsync(int userId)
@@ -105,11 +109,11 @@ namespace PasswordStorageApi.Service.Implementaion
                 return null;
 
             var oldPassword = EncryptionHelper.Decrypt(passwordToUpdate.EncryptedPassword);
-            if (oldPassword != changePasswordDTO.OldPassword)
-                throw new ArgumentException("The old password is incorrect.");
+            if (!oldPassword.Equals(changePasswordDTO.OldPassword, StringComparison.Ordinal))
+                throw new ArgumentException("Old password is incorrect.");
 
-            if (!changePasswordDTO.NewPassword.Equals(changePasswordDTO.ConfirmPassword))
-                throw new ArgumentException("New password and confirm password do not match.");
+            if (!changePasswordDTO.NewPassword.Equals(changePasswordDTO.ConfirmPassword, StringComparison.Ordinal))
+                throw new ArgumentException("New password and confirmation password do not match.");
 
             var newSalt = SaltHelper.GenerateSalt(16);
             string encryptedNewPassword = EncryptionHelper.Encrypt(changePasswordDTO.NewPassword, newSalt);

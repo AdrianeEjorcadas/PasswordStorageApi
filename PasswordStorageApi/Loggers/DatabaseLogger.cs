@@ -1,5 +1,4 @@
-﻿
-namespace PasswordStorageApi.Service.Logging
+﻿namespace PasswordStorageApi.Loggers
 {
     public class DatabaseLogger : ILogger
     {

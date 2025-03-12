@@ -3,7 +3,6 @@ using PasswordStorageApi.Data;
 using PasswordStorageApi.DTO;
 using PasswordStorageApi.Models;
 using PasswordStorageApi.Repository.Interface;
-using PasswordStorageApi.Service.Logging;
 
 namespace PasswordStorageApi.Repository.Implementation
 {

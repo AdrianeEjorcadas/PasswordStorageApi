@@ -84,7 +84,7 @@ namespace PasswordStorageApi.Controllers
         }
 
         [HttpGet("platform-passwords/{userId:int}/{platformId:int}")]
-        public async Task<ActionResult<IEnumerable<PasswordModel?>>> GetPasswordByPlatform(int userId,  int platformId)
+        public async Task<ActionResult<IEnumerable<PasswordModel?>>> GetPasswordByPlatform(int userId, int platformId)
         {
             try
             {
@@ -142,5 +142,45 @@ namespace PasswordStorageApi.Controllers
             }
         }
 
+        [HttpDelete("delete-password/{passwordId:int}")]
+        public async Task<ActionResult<PasswordModel>> DeletePasswordAsync(int passwordId)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var deletedPassword = await _passwordService.DeletePasswordAsync(passwordId);
+                if (deletedPassword is null)
+                    return NotFound("password not found");
+                return Ok(deletedPassword);
+            }
+            catch (ArgumentException argex)
+            {
+                return BadRequest(new { Message = argex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to delete password");
+            }
+        }
+
+        [HttpPut("change-password-status")]
+        public async Task<ActionResult<bool>> ChangePassworStatusdAsync([FromQuery] int passwordId)
+        {
+            try
+            {
+                var IsStatusChanged = await _passwordService.ChangePassworStatusdAsync(passwordId);
+                return Ok("Password status successfully updated!");
+            } 
+            catch (ArgumentException argex)
+            {
+                return BadRequest(new { Message = argex.Message });
+            } 
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
