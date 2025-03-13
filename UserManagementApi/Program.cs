@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using UserManagementApi.Data;
+using UserManagementApi.Repositories;
 using UserManagementApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 //add services
 builder.Services.AddScoped<IUserService, UserService>();
+//add repo
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 //builder.Services.AddEndpointsApiExplorer(); // for minimal api
 

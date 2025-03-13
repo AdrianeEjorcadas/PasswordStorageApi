@@ -12,7 +12,6 @@ namespace UserManagementApi.DTO
         [Required(ErrorMessage = "Password is required!")]
         public string Password { get; set; }
 
-
         [Required(ErrorMessage = "Email Address is required!")]
         public string Email { get; set; }
     }

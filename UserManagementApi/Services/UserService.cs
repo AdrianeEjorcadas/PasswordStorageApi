@@ -1,13 +1,31 @@
 ﻿using UserManagementApi.DTO;
+using UserManagementApi.Helpers;
 using UserManagementApi.Models;
+using UserManagementApi.Repositories;
 
 namespace UserManagementApi.Services
 {
     public class UserService : IUserService
     {
-        public Task<UserModel> CreateUserAsync(AddUserDTO addUserDTO)
+        IUserRepository _userRepository;
+        public UserService(IUserRepository userRepository)
         {
-            throw new NotImplementedException();
+            _userRepository = userRepository;
+        }
+
+        public async Task<UserModel> CreateUserAsync(AddUserDTO addUserDTO)
+        {
+            var salt = HashingHelper.GenerateSalt(16);
+            var hashedPassword = HashingHelper.HashPassword(addUserDTO.Password, salt);
+            var userModel = new UserModel
+            {
+                UserName = addUserDTO.UserName,
+                Email = addUserDTO.Email,
+                Password = hashedPassword,
+                Salt = Convert.ToBase64String(salt)
+            };
+
+            return await _userRepository.CreateUserAsync(userModel);
         }
     }
 }
