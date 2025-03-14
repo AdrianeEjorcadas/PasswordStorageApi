@@ -2,7 +2,7 @@
 
 namespace UserManagementApi.Models
 {
-    public class UserModel
+    public class UserCredentialModel
     {
         [Key]
         public Guid Id { get; set; }
@@ -18,6 +18,7 @@ namespace UserManagementApi.Models
         public string Salt { get; set; }
 
         [Required(ErrorMessage ="Email is required!")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address")]
         public string Email { get; set; }
 
         public bool IsActive { get; set; }

@@ -13,11 +13,11 @@ namespace UserManagementApi.Services
             _userRepository = userRepository;
         }
 
-        public async Task<UserModel> CreateUserAsync(AddUserDTO addUserDTO)
+        public async Task<UserCredentialModel> CreateUserAsync(AddUserDTO addUserDTO)
         {
             var salt = HashingHelper.GenerateSalt(16);
             var hashedPassword = HashingHelper.HashPassword(addUserDTO.Password, salt);
-            var userModel = new UserModel
+            var userModel = new UserCredentialModel
             {
                 UserName = addUserDTO.UserName,
                 Email = addUserDTO.Email,
@@ -28,4 +28,5 @@ namespace UserManagementApi.Services
             return await _userRepository.CreateUserAsync(userModel);
         }
     }
+
 }

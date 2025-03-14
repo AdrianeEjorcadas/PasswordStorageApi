@@ -51,6 +51,7 @@ builder.Services.AddCors(options =>
 // Add Swagger services
 builder.Services.AddSwaggerGen(c => // Change builder.AddSwaggerGen to builder.Services.AddSwaggerGen
 {
+    c.CustomSchemaIds(type => type.FullName);
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "Password Storage API",

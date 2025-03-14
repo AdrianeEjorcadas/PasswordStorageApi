@@ -5,6 +5,6 @@ namespace UserManagementApi.Repositories
 {
     public interface IUserRepository
     {
-        public Task<UserModel> CreateUserAsync(UserModel userModel);
+        public Task<UserCredentialModel> CreateUserAsync(UserCredentialModel userModel);
     }
 }

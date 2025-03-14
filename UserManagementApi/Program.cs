@@ -28,6 +28,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 //Add Swagger
 builder.Services.AddSwaggerGen(options =>
 {
+    options.CustomSchemaIds(type => type.FullName);
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "User Management API",
@@ -37,13 +38,13 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 //Add CORS - since i am getting an Httpconnectivity error
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("AllowAllOrigins",
-//        builder => builder.AllowAnyOrigin()
-//                          .AllowAnyMethod()
-//                          .AllowAnyHeader());
-//});
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
 
 var app = builder.Build();
 

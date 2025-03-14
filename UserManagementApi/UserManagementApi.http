@@ -1,6 +1,17 @@
-@UserManagementApi_HostAddress = http://localhost:5181
+@UserManagementApi_HostAddress = https://localhost:7018
 
 GET {{UserManagementApi_HostAddress}}/weatherforecast/
 Accept: application/json
+
+###
+
+POST {{UserManagementApi_HostAddress}}/api/user/create-user
+Content-Type: application/json
+
+{
+  "userName": "adrianezacari",
+  "password": "testingngpassword",
+  "email": "adriane.zacari@test.com"
+}
 
 ###

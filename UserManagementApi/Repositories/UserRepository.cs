@@ -12,9 +12,12 @@ namespace UserManagementApi.Repositories
         {
             _context = context;
         }
-        public Task<UserModel> CreateUserAsync(UserModel userModel)
+
+        public async Task<UserCredentialModel> CreateUserAsync(UserCredentialModel userModel)
         {
-            throw new NotImplementedException();
+            await _context.AddAsync(userModel);
+            await _context.SaveChangesAsync();
+            return userModel;
         }
     }
 }

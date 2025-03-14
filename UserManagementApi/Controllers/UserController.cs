@@ -16,12 +16,14 @@ namespace UserManagementApi.Controllers
         }
 
         [HttpPost("create-user")]
-        public async Task<ActionResult<UserModel>> CreateUser([FromBody] AddUserDTO addUserDTO)
+        public async Task<ActionResult<UserCredentialModel>> CreateUser([FromBody] AddUserDTO addUserDTO)
         {
             try
             {
-                var user = _userService.CreateUserAsync(addUserDTO);
-                return Ok(addUserDTO);
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+                var user = await _userService.CreateUserAsync(addUserDTO);
+                return Ok(user);
             }
             catch (ArgumentException aex)
             {
