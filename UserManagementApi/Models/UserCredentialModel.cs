@@ -7,18 +7,16 @@ namespace UserManagementApi.Models
         [Key]
         public Guid Id { get; set; }
 
-        [Required(ErrorMessage = "User name is required!")]
-        [StringLength(25, MinimumLength = 6, ErrorMessage ="User name must be more than 6 character")]
+        [Required)]
         public string UserName { get; set; }
 
-        [Required(ErrorMessage ="Password is required!")]
+        [Required]
         public string Password { get; set; }
 
         [Required]
         public string Salt { get; set; }
 
-        [Required(ErrorMessage ="Email is required!")]
-        [EmailAddress(ErrorMessage = "Please enter a valid email address")]
+        [Required]
         public string Email { get; set; }
 
         public bool IsActive { get; set; }
