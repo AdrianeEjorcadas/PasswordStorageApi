@@ -7,7 +7,7 @@ namespace UserManagementApi.Models
         [Key]
         public Guid Id { get; set; }
 
-        [Required)]
+        [Required]
         public string UserName { get; set; }
 
         [Required]
