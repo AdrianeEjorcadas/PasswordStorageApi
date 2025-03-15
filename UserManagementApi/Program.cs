@@ -38,13 +38,13 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 //Add CORS - since i am getting an Httpconnectivity error
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAllOrigins",
-        builder => builder.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader());
-});
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowAllOrigins",
+//        builder => builder.AllowAnyOrigin()
+//                          .AllowAnyMethod()
+//                          .AllowAnyHeader());
+//});
 
 var app = builder.Build();
 

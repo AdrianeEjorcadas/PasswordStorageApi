@@ -6,5 +6,7 @@ namespace UserManagementApi.Services
     public interface IUserService
     {
         public Task<UserCredentialModel> CreateUserAsync(AddUserDTO addUserDTO);
+
+        public Task<UserCredentialModel> ChangePasswordAsync(string userId, ChangePasswordDTO changePasswordDTO);
     }
 }

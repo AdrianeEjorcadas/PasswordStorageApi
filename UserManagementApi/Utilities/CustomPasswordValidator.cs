@@ -7,7 +7,7 @@ namespace UserManagementApi.Utilities
     {
         public static bool IsValid(string password, out string errorMessage)
         {
-            Regex regex = new ("[^A-Za-z0-9]");
+            Regex specialCharacterRegex = new ("[^A-Za-z0-9]");
 
             if (password.Length < 8)
             {
@@ -45,7 +45,7 @@ namespace UserManagementApi.Utilities
                 return false;
             }
 
-            if (regex.IsMatch(password))
+            if (!specialCharacterRegex.IsMatch(password))
             {
                 errorMessage = "Password must include at least one special character.";
                 return false;
