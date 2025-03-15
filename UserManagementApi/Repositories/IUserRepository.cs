@@ -9,11 +9,11 @@ namespace UserManagementApi.Repositories
 
         public Task<bool> IsUserExist(string username);
 
-        public Task<(string? oldPassword, string? salt)> GetOldPasswordAndSaltAsync(string userId);
+        public Task<(string? oldPassword, string? salt)> GetOldPasswordAndSaltAsync(Guid userId);
 
         public Task<UserCredentialModel> CreateUserAsync(UserCredentialModel userModel);
 
-        public Task<UserCredentialModel> ChangePasswordAsync(string newPassword, string salt);
+        public Task<UserCredentialModel> ChangePasswordAsync(UserCredentialModel userCredentialModel, Guid userId);
 
     }
 }

@@ -4,6 +4,8 @@ namespace UserManagementApi.DTO
 {
     public class ChangePasswordDTO
     {
+        [Required]
+        public Guid UserId { get; set; }
 
         [Required(ErrorMessage = "Old Password is required!")]
         [StringLength(30, MinimumLength = 8, ErrorMessage = "A password should contain between 8 and 30 characters.")]

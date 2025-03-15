@@ -27,7 +27,7 @@ namespace UserManagementApi.Controllers
             }
             catch (ArgumentException aex)
             {
-                return BadRequest(new { Message = aex.Message });
+                return BadRequest(new { ErrorMessage = aex.Message });
             }
             catch (Exception ex) 
             {
@@ -36,18 +36,18 @@ namespace UserManagementApi.Controllers
         }
 
         [HttpPut("change-password")]
-        public async Task<ActionResult<UserCredentialModel>> ChangePasswordAsync([FromBody] string userId, [FromBody] ChangePasswordDTO changePasswordDTO) 
+        public async Task<ActionResult<string>> ChangePasswordAsync(ChangePasswordDTO changePasswordDTO) 
         {
             try
             {
                 if (!ModelState.IsValid) 
                     return BadRequest(ModelState);
-                await _userService.ChangePasswordAsync(userId, changePasswordDTO);
+                await _userService.ChangePasswordAsync(changePasswordDTO);
                 return Ok("Your password has been successfully updated.");
             }
             catch (ArgumentException aex)
             {
-                return BadRequest(new { Message = aex.Message });
+                return BadRequest(new { ErrorMessage = aex.Message });
             }
             catch (Exception ex) 
             {

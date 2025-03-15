@@ -4,6 +4,7 @@ namespace PasswordStorageApi.DTO
 {
     public class ChangePasswordDTO
     {
+
         [Required(ErrorMessage = "Password id is required")]
         public int PasswordId { get; set; }
 

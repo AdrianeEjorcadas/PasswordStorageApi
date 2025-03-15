@@ -53,12 +53,12 @@ namespace UserManagementApi.Services
             return await _userRepository.CreateUserAsync(userModel);
         }
 
-        public async Task<UserCredentialModel> ChangePasswordAsync(string userId, ChangePasswordDTO changePasswordDTO)
+        public async Task<UserCredentialModel> ChangePasswordAsync(ChangePasswordDTO changePasswordDTO)
         {
             // retrieve current password and salt
-            var (oldPassword, salt) = await _userRepository.GetOldPasswordAndSaltAsync(userId);
+            var (oldPassword, salt) = await _userRepository.GetOldPasswordAndSaltAsync(changePasswordDTO.UserId);
             // convert retrieved salt into byte
-            byte[] byteSalt = Encoding.UTF8.GetBytes(salt);
+            byte[] byteSalt = Convert.FromBase64String(salt);
             // hash the user input current password
             var hashedInputedOldPassword = HashingHelper.HashPassword(changePasswordDTO.OldPassword, byteSalt);
             // hash the user input new password
@@ -80,7 +80,13 @@ namespace UserManagementApi.Services
                 throw new ArgumentException("The new password and confirmation password you entered do not match.");
             }
 
-            return await _userRepository.ChangePasswordAsync(hashedNewPassword, salt);
+            var userModel = new UserCredentialModel
+            {
+                Password = hashedNewPassword,
+                Salt = Convert.ToBase64String(byteSalt)
+            };
+
+            return await _userRepository.ChangePasswordAsync(userModel, changePasswordDTO.UserId);
 
         }
     }
