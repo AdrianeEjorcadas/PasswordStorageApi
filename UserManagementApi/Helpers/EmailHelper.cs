@@ -10,7 +10,7 @@ public class EmailHelper
         _configuration = configuration;
     }
 
-    public void SendEmail(string to, string subject, string body)
+    public async Task SendEmail(string toEmail, string subject, string body)
     {
         // Get SMTP configuration from appsettings.json
         var smtpConfig = _configuration.GetSection("Smtp");
@@ -18,21 +18,19 @@ public class EmailHelper
         {
             Host = smtpConfig["Host"],
             Port = int.Parse(smtpConfig["Port"]),
-            EnableSsl = bool.Parse(smtpConfig["EnableSsl"]),
+            EnableSsl = true,
             Credentials = new NetworkCredential(smtpConfig["Username"], smtpConfig["Password"])
         };
 
         var mailMessage = new MailMessage
         {
-            From = new MailAddress(smtpConfig["Username"]),
+            From = new MailAddress(smtpConfig["Username"], "Adriane Test"),
             Subject = subject,
             Body = body,
-            IsBodyHtml = true // Set to true for HTML emails
+            IsBodyHtml = true
         };
+        mailMessage.To.Add(toEmail);
 
-        mailMessage.To.Add(to);
-
-        // Send the email
-        smtpClient.Send(mailMessage);
+        await smtpClient.SendMailAsync(mailMessage);
     }
 }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using UserManagementApi.Data;
+using UserManagementApi.Helpers;
 using UserManagementApi.Repositories;
 using UserManagementApi.Services;
 
@@ -24,6 +25,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 //add email service
 builder.Services.AddTransient<EmailHelper>();
+builder.Services.AddTransient<SibEmailHelper>();
 // add http context
 builder.Services.AddHttpContextAccessor();
 

@@ -56,13 +56,13 @@ namespace UserManagementApi.Controllers
         }
 
         [HttpPost("forgot-password")]
-        public async Task<ActionResult<string>> ForgotPasswordAsync([FromBody] string email)
+        public async Task<ActionResult<string>> ForgotPasswordAsync([FromBody] ForgotPasswordDTO forgotPasswordDTO)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
-                await _userService.ForgotPasswordAsync(email);
+                await _userService.ForgotPasswordAsync(forgotPasswordDTO.EmailAddress);
                 return Ok("If the email exists, a password reset link has been sent.");
             }
             catch (ArgumentException aex)

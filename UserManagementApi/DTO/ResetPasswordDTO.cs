@@ -7,5 +7,13 @@ namespace UserManagementApi.DTO
         [Required(ErrorMessage = "Email Address is required!")]
         [EmailAddress(ErrorMessage = "Please provide a valid email address.")]
         public string EmailAddress { get; set; }
+
+        [Required(ErrorMessage = "New password is required!")]
+        [StringLength(30, MinimumLength = 8, ErrorMessage = "A password should contain between 8 and 30 characters")]
+        public string NewPassword { get; set; }
+
+        [Required(ErrorMessage = "Confirmation password is required!")]
+        [StringLength(30, MinimumLength = 8, ErrorMessage = "A password should contain between 8 and 30 characters")]
+        public string ConfirmPassword { get; set; }
     }
 }

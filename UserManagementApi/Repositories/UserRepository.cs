@@ -59,9 +59,29 @@ namespace UserManagementApi.Repositories
             return userCredentialModel;
         }
 
-        public Task<bool> CreateResetTokenAsync(string email, string hashedToken)
+        public async Task<bool> CreateResetTokenAsync(string email, string hashedToken)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var userId = await _context.Users
+                    .Where(u => u.Email == email)
+                    .Select(u => u.Id)
+                    .FirstOrDefaultAsync();
+
+                var userPasswordReset = new UserPasswordResetModel
+                {
+                    UserId = userId,
+                    Token = hashedToken
+                };
+
+                await _context.AddAsync(userPasswordReset);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex) 
+            {
+                return false;
+            }
         }
     }
 }

@@ -12,7 +12,7 @@ namespace UserManagementApi.Services
         private readonly IUserRepository _userRepository;
         private readonly EmailHelper _emailService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public UserService(IUserRepository userRepository, 
+        public UserService(IUserRepository userRepository,
                             EmailHelper emailService,
                             IHttpContextAccessor httpContextAccessor)
         {
@@ -106,7 +106,7 @@ namespace UserManagementApi.Services
             var hashedToken = HashingHelper.HashToken(token);
             var tokenString = Convert.ToBase64String(token);
 
-            //Validate if the reset token is registered
+            //Validate if the reset token is registered to the db
             var isTokenRegister = await _userRepository.CreateResetTokenAsync(email, hashedToken);
             if (!isTokenRegister)
                 throw new Exception("Failed to register the reset token");
