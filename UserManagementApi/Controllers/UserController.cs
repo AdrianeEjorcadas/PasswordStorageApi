@@ -36,7 +36,7 @@ namespace UserManagementApi.Controllers
         }
 
         [HttpPut("change-password")]
-        public async Task<ActionResult<string>> ChangePasswordAsync(ChangePasswordDTO changePasswordDTO) 
+        public async Task<ActionResult<string>> ChangePasswordAsync([FromBody] ChangePasswordDTO changePasswordDTO) 
         {
             try
             {
@@ -55,5 +55,26 @@ namespace UserManagementApi.Controllers
             }
         }
 
+        [HttpPost("forgot-password")]
+        public async Task<ActionResult<string>> ForgotPasswordAsync([FromBody] string email)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+                await _userService.ForgotPasswordAsync(email);
+                return Ok("If the email exists, a password reset link has been sent.");
+            }
+            catch (ArgumentException aex)
+            {
+                return BadRequest(new { ErrorMessage = aex.Message });
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest($"Error: {ex.Message}");
+            }
+        }
+
     }
 }
+

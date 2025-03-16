@@ -9,16 +9,22 @@ namespace UserManagementApi.Services
 {
     public class UserService : IUserService
     {
-        IUserRepository _userRepository;
-        public UserService(IUserRepository userRepository)
+        private readonly IUserRepository _userRepository;
+        private readonly EmailHelper _emailService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public UserService(IUserRepository userRepository, 
+                            EmailHelper emailService,
+                            IHttpContextAccessor httpContextAccessor)
         {
             _userRepository = userRepository;
+            _emailService = emailService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<UserCredentialModel> CreateUserAsync(AddUserDTO addUserDTO)
         {
-            var isUserExists = await _userRepository.IsUserExist(addUserDTO.UserName);
-            var isEmailExists = await _userRepository.IsEmailExist(addUserDTO.Email);
+            var isUserExists = await _userRepository.IsUserExistAsync(addUserDTO.UserName);
+            var isEmailExists = await _userRepository.IsEmailExistAsync(addUserDTO.Email);
 
             if (isUserExists)
             {
@@ -87,7 +93,34 @@ namespace UserManagementApi.Services
             };
 
             return await _userRepository.ChangePasswordAsync(userModel, changePasswordDTO.UserId);
+        }
 
+        public async Task<bool> ForgotPasswordAsync(string email)
+        {
+            var isEmailExists = await _userRepository.IsEmailExistAsync(email);
+            if (!isEmailExists)
+                return false;
+            
+            // Generate reset token
+            var token = HashingHelper.GenerateSalt(32);
+            var hashedToken = HashingHelper.HashToken(token);
+            var tokenString = Convert.ToBase64String(token);
+
+            //Validate if the reset token is registered
+            var isTokenRegister = await _userRepository.CreateResetTokenAsync(email, hashedToken);
+            if (!isTokenRegister)
+                throw new Exception("Failed to register the reset token");
+
+            // Generate reset link
+            var resetLinkHelper = new ResetLinkHelper(_httpContextAccessor);
+            var resetLink = resetLinkHelper.GenerateResetLink(tokenString);
+
+            //Send link via email
+            var subject = "Password Reset";
+            var body = $"Click the link to reset your password: <a href='{resetLink}'>{resetLink}</a>";
+            _emailService.SendEmail(email, subject, body);
+
+            return true;
         }
     }
 

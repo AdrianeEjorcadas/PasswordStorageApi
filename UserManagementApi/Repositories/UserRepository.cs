@@ -14,13 +14,13 @@ namespace UserManagementApi.Repositories
             _context = context;
         }
 
-        public async Task<bool> IsEmailExist(string email)
+        public async Task<bool> IsEmailExistAsync(string email)
         {
                 return await _context.Users
                 .AnyAsync(u => u.Email == email);
         }
 
-        public async Task<bool> IsUserExist(string username)
+        public async Task<bool> IsUserExistAsync(string username)
         {
             return await _context.Users
                 .AnyAsync(u => u.UserName == username);
@@ -57,6 +57,11 @@ namespace UserManagementApi.Repositories
             await _context.SaveChangesAsync();
 
             return userCredentialModel;
+        }
+
+        public Task<bool> CreateResetTokenAsync(string email, string hashedToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

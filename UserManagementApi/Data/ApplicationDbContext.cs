@@ -6,6 +6,7 @@ namespace UserManagementApi.Data
     public class ApplicationDbContext : DbContext
     {
         public DbSet<UserCredentialModel> Users { get; set; }
+        public DbSet<UserPasswordResetModel> UserPasswordResets { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -44,6 +45,11 @@ namespace UserManagementApi.Data
                     user.IsActive = true;
                     user.IsDeleted = false;
                     user.CreatedAt = currentTime;
+                }
+                else if(entry.Entity is UserPasswordResetModel passwordReset)
+                {
+                    passwordReset.TokenId = Guid.NewGuid();
+                    passwordReset.ExpirationDateTime = currentTime.AddMinutes(10);
                 }
             }
         }
