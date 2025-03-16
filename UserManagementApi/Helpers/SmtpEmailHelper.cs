@@ -1,11 +1,11 @@
 ﻿using System.Net;
 using System.Net.Mail;
 
-public class EmailHelper
+public class SmtpEmailHelper
 {
     private readonly IConfiguration _configuration;
 
-    public EmailHelper(IConfiguration configuration)
+    public SmtpEmailHelper(IConfiguration configuration)
     {
         _configuration = configuration;
     }
@@ -31,6 +31,13 @@ public class EmailHelper
         };
         mailMessage.To.Add(toEmail);
 
-        await smtpClient.SendMailAsync(mailMessage);
+        try
+        {
+            await smtpClient.SendMailAsync(mailMessage);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error sending email {ex.Message}");
+        }
     }
 }

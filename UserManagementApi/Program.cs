@@ -24,7 +24,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 //add repo
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 //add email service
-builder.Services.AddTransient<EmailHelper>();
+builder.Services.AddTransient<SmtpEmailHelper>();
 builder.Services.AddTransient<SibEmailHelper>();
 // add http context
 builder.Services.AddHttpContextAccessor();

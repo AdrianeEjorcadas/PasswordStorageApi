@@ -24,7 +24,7 @@ namespace UserManagementApi.Helpers
                 To = new List<SendSmtpEmailTo> { new SendSmtpEmailTo(toEmail) },
                 Subject = subject,
                 HtmlContent = body,
-                Sender = new SendSmtpEmailSender("adrianeejocadas97@gmail.com", "Test email") // Update with your sender details
+                Sender = new SendSmtpEmailSender("Adriane Ejorcadas", "adrianeejocadas97@gmail.com") // Update with your sender details
             };
 
             try

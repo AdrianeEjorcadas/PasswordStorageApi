@@ -10,10 +10,10 @@ namespace UserManagementApi.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly EmailHelper _emailService;
+        private readonly SmtpEmailHelper _emailService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         public UserService(IUserRepository userRepository,
-                            EmailHelper emailService,
+                            SmtpEmailHelper emailService,
                             IHttpContextAccessor httpContextAccessor)
         {
             _userRepository = userRepository;
@@ -118,7 +118,7 @@ namespace UserManagementApi.Services
             //Send link via email
             var subject = "Password Reset";
             var body = $"Click the link to reset your password: <a href='{resetLink}'>{resetLink}</a>";
-            _emailService.SendEmail(email, subject, body);
+            await _emailService.SendEmail(email, subject, body);
 
             return true;
         }
