@@ -13,6 +13,7 @@ namespace UserManagementApi.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<UserCredentialModel>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<UserPasswordResetModel>().HasQueryFilter(e => !e.IsUsed);
         }
 
         public override int SaveChanges()
@@ -64,9 +65,13 @@ namespace UserManagementApi.Data
 
             foreach(var entry in entries)
             {
-                if(entry.Entity is UserCredentialModel user)
+                if (entry.Entity is UserCredentialModel user)
                 {
                     user.UpdatedAt = currentTime;
+                }
+                else if (entry.Entity is UserPasswordResetModel userPasswordReset) 
+                {
+                    userPasswordReset.IsUsed = true;
                 }
             }
         }

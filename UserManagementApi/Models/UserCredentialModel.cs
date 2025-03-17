@@ -19,8 +19,12 @@ namespace UserManagementApi.Models
         [Required]
         public string Email { get; set; }
 
+        public int FailedLoginAttempts { get; set; }
+
         public bool IsActive { get; set; }
-        
+
+        public bool IsLocked { get; set; }
+
         public bool IsDeleted { get; set; }
 
         [Required]

@@ -126,8 +126,8 @@ namespace UserManagementApi.Services
         public async Task<UserCredentialModel> ResetPasswordAsync(string token, ResetPasswordDTO resetPasswordDTO)
         {
             // retrieved token details
-            var hashedArgumentToken = Convert.FromBase64String(token);
-            var hashedToken = HashingHelper.HashToken(hashedArgumentToken);
+            var byteArgumentToken = Convert.FromBase64String(token);
+            var hashedToken = HashingHelper.HashToken(byteArgumentToken);
             var (tokenRetrieved, userId, expirationDateTime) = await _userRepository.GetTokenDetailsAsync(hashedToken);
 
             //token checking
