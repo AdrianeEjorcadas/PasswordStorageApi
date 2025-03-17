@@ -10,5 +10,7 @@ namespace UserManagementApi.Services
         public Task<UserCredentialModel> ChangePasswordAsync(ChangePasswordDTO changePasswordDTO);
 
         public Task<bool> ForgotPasswordAsync(string email);
+
+        public Task<UserCredentialModel> ResetPasswordAsync(string token, ResetPasswordDTO resetPasswordDTO);
     }
 }

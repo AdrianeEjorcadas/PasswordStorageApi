@@ -39,11 +39,36 @@ namespace UserManagementApi.Repositories
             return result;
         }
 
+        public async Task<string?> GetSaltAsync(Guid userId)
+        {
+            return await _context.Users
+                .Where(u => u.Id == userId)
+                .Select(u => u.Salt)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<UserCredentialModel> CreateUserAsync(UserCredentialModel userModel)
         {
             await _context.AddAsync(userModel);
             await _context.SaveChangesAsync();
             return userModel;
+        }
+
+        public async Task<(string? retrievedToken, Guid userId, DateTime expirationDateTime)> GetTokenDetailsAsync(string token)
+        {
+            var result = await _context.UserPasswordResets
+                .Where(t => t.Token == token)
+                .Select(t => new { t.Token, t.UserId, t.ExpirationDateTime })
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if (result == null)
+            {
+                return (null, Guid.Empty, DateTime.MinValue);
+            }
+
+            return (result.Token, result.UserId, result.ExpirationDateTime);
         }
 
         public async Task<UserCredentialModel> ChangePasswordAsync(UserCredentialModel userCredentialModel, Guid userId)
@@ -82,6 +107,18 @@ namespace UserManagementApi.Repositories
             {
                 return false;
             }
+        }
+
+        public async Task<UserCredentialModel> ResetPasswordAsync(UserCredentialModel userCredentialModel, Guid userId)
+        {
+            var passwordToUpdate = await _context.Users
+                .Where(u => u.Id == userId)
+                .FirstOrDefaultAsync();
+
+            passwordToUpdate.Password = userCredentialModel.Password;
+            await _context.SaveChangesAsync();
+
+            return userCredentialModel;   
         }
     }
 }

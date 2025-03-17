@@ -24,7 +24,7 @@ public class SmtpEmailHelper
 
         var mailMessage = new MailMessage
         {
-            From = new MailAddress(smtpConfig["Username"], "Adriane Test"),
+            From = new MailAddress(smtpConfig["Username"], "Test Email"),
             Subject = subject,
             Body = body,
             IsBodyHtml = true

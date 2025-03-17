@@ -122,6 +122,45 @@ namespace UserManagementApi.Services
 
             return true;
         }
+
+        public async Task<UserCredentialModel> ResetPasswordAsync(string token, ResetPasswordDTO resetPasswordDTO)
+        {
+            // retrieved token details
+            var hashedArgumentToken = Convert.FromBase64String(token);
+            var hashedToken = HashingHelper.HashToken(hashedArgumentToken);
+            var (tokenRetrieved, userId, expirationDateTime) = await _userRepository.GetTokenDetailsAsync(hashedToken);
+
+            //token checking
+            if (tokenRetrieved is null)
+                throw new ArgumentException("Invalid or missing reset token. Please ensure you are using the correct link or request a new password reset.");
+
+            if (!tokenRetrieved.Equals(hashedToken, StringComparison.Ordinal))
+                throw new ArgumentException("The reset token is invalid or has expired. Please request a new password reset link.");
+
+            // expiration of token checking
+            if (expirationDateTime == default || expirationDateTime < DateTime.UtcNow)
+                throw new ArgumentException("The reset token has expired. Please request a new password reset link.");
+
+            // password checking
+            if (!CustomPasswordValidator.IsValid(resetPasswordDTO.NewPassword, out string errorMessage))
+                throw new ArgumentException(errorMessage);
+
+            if (!resetPasswordDTO.NewPassword.Equals(resetPasswordDTO.ConfirmPassword, StringComparison.Ordinal))
+                throw new ArgumentException("The new password and confirmation password you entered do not match.");
+
+            // hashing new password
+            var userSalt = await _userRepository.GetSaltAsync(userId);
+            var byteSalt = Convert.FromBase64String(userSalt);
+            var hashedNewPassword = HashingHelper.HashPassword(resetPasswordDTO.NewPassword, byteSalt);
+
+            var userCredsModel = new UserCredentialModel
+            {
+                Password = hashedNewPassword
+            };
+
+            return await _userRepository.ResetPasswordAsync(userCredsModel, userId);
+
+        }
     }
 
 }

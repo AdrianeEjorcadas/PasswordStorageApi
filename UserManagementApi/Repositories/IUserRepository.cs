@@ -11,11 +11,17 @@ namespace UserManagementApi.Repositories
 
         public Task<(string? oldPassword, string? salt)> GetOldPasswordAndSaltAsync(Guid userId);
 
+        public Task<string?> GetSaltAsync(Guid userId);
+
+        public Task<(string? retrievedToken, Guid userId, DateTime expirationDateTime)> GetTokenDetailsAsync(string token);
+
         public Task<UserCredentialModel> CreateUserAsync(UserCredentialModel userModel);
 
         public Task<UserCredentialModel> ChangePasswordAsync(UserCredentialModel userCredentialModel, Guid userId);
 
         public Task<bool> CreateResetTokenAsync(string email, string hashedToken);
+
+        public Task<UserCredentialModel> ResetPasswordAsync(UserCredentialModel userCredentialModel, Guid userId);
 
     }
 }

@@ -75,6 +75,27 @@ namespace UserManagementApi.Controllers
             }
         }
 
+        [HttpPost("reset-password")]
+        public async Task<ActionResult<string>> ResetPasswordAsync(
+                        [FromQuery] string token, 
+                        [FromBody] ResetPasswordDTO resetPasswordDTO)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+                var userCreds = await _userService.ResetPasswordAsync(token, resetPasswordDTO);
+                return Ok("Your password has been successfully updated.");
+            }
+            catch (ArgumentException aex)
+            {
+                return BadRequest(new {ErrorMessage=aex.Message});
+            } catch(Exception ex)
+            {
+                return BadRequest($"Error: {ex.Message}");
+            }
+        }
+
     }
 }
 
