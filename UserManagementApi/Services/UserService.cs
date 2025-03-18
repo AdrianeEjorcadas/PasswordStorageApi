@@ -160,7 +160,12 @@ namespace UserManagementApi.Services
                 Password = hashedNewPassword
             };
 
-            return await _userRepository.ResetPasswordAsync(userCredsModel, userId);
+            var user = await _userRepository.ResetPasswordAsync(userCredsModel, userId);
+
+            // reset account lock details
+            await _userRepository.ResetAccountLocked(user.Email);
+
+            return user;
         }
 
         public async Task<string?> LoginAsync(LoginDTO loginDTO)
@@ -186,12 +191,15 @@ namespace UserManagementApi.Services
                 throw new ArgumentException("Your account has been locked due to security reasons. Please reset your password to regain access.");
 
             // compare passwords
-            if (CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(password), Convert.FromBase64String(hashedInputPassword)))
+            if (!CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(password), Convert.FromBase64String(hashedInputPassword)))
             {
                 // add login attempts count
                 await _userRepository.AddFailureCountAndLockedAccount(loginDTO.EmailAddress);
+                throw new ArgumentException("Incorrect email address or password");
             }
 
+            // reset the login failure count
+            await _userRepository.ResetAccountLocked(loginDTO.EmailAddress);
             return "authToken";
         }
     }

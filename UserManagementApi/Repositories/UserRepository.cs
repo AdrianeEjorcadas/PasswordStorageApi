@@ -81,6 +81,17 @@ namespace UserManagementApi.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task ResetAccountLocked(string email)
+        {
+            var result = await _context.Users
+                .Where(u => u.Email == email)
+                .FirstOrDefaultAsync();
+
+            result.IsLocked = false;
+            result.FailedLoginAttempts = 0;
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<UserCredentialModel> CreateUserAsync(UserCredentialModel userModel)
         {
             await _context.AddAsync(userModel);
@@ -117,7 +128,7 @@ namespace UserManagementApi.Repositories
                 return (null, null, null);
             }
 
-            return (result.UserName, result.Password, result.Password);
+            return (result.UserName, result.Password, result.Salt);
         }
 
         public async Task<UserCredentialModel> ChangePasswordAsync(UserCredentialModel userCredentialModel, Guid userId)
@@ -167,7 +178,7 @@ namespace UserManagementApi.Repositories
             passwordToUpdate.Password = userCredentialModel.Password;
             await _context.SaveChangesAsync();
 
-            return userCredentialModel;   
+            return passwordToUpdate;   
         }
     }
 }

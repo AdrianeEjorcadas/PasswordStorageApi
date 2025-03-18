@@ -99,7 +99,21 @@ namespace UserManagementApi.Controllers
         [HttpPut("login")]
         public async Task<ActionResult> LoginAsync(LoginDTO loginDTO)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+                var token = await _userService.LoginAsync(loginDTO);
+                return Ok("Successfully Login");
+            }
+            catch (ArgumentException aex)
+            {
+                return BadRequest(new { ErrorMessage = aex.Message });
+            }
+            catch (Exception e) 
+            {
+                return BadRequest($"Error: {e.Message}");
+            }
         }
 
     }

@@ -13,6 +13,8 @@ namespace UserManagementApi.Repositories
 
         public Task AddFailureCountAndLockedAccount(string email);
 
+        public Task ResetAccountLocked(string email);
+
         public Task<string?> GetSaltAsync(Guid userId);
 
         public Task<bool> IsUserLockedAsync(string email);
