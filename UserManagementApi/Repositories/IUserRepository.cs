@@ -11,7 +11,13 @@ namespace UserManagementApi.Repositories
 
         public Task<(string? oldPassword, string? salt)> GetOldPasswordAndSaltAsync(Guid userId);
 
+        public Task AddFailureCountAndLockedAccount(string email);
+
         public Task<string?> GetSaltAsync(Guid userId);
+
+        public Task<bool> IsUserLockedAsync(string email);
+
+        public Task<(string username, string password, string? salt)> GetUserCredentialAsync(string email); 
 
         public Task<(string? retrievedToken, Guid userId, DateTime expirationDateTime)> GetTokenDetailsAsync(string token);
 

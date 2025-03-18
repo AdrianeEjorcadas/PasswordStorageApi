@@ -36,7 +36,7 @@ namespace UserManagementApi.Controllers
         }
 
         [HttpPut("change-password")]
-        public async Task<ActionResult<string>> ChangePasswordAsync([FromBody] ChangePasswordDTO changePasswordDTO) 
+        public async Task<ActionResult> ChangePasswordAsync([FromBody] ChangePasswordDTO changePasswordDTO) 
         {
             try
             {
@@ -56,7 +56,7 @@ namespace UserManagementApi.Controllers
         }
 
         [HttpPost("forgot-password")]
-        public async Task<ActionResult<string>> ForgotPasswordAsync([FromBody] ForgotPasswordDTO forgotPasswordDTO)
+        public async Task<ActionResult> ForgotPasswordAsync([FromBody] ForgotPasswordDTO forgotPasswordDTO)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace UserManagementApi.Controllers
         }
 
         [HttpPost("reset-password")]
-        public async Task<ActionResult<string>> ResetPasswordAsync(
+        public async Task<ActionResult> ResetPasswordAsync(
                         [FromQuery] string token, 
                         [FromBody] ResetPasswordDTO resetPasswordDTO)
         {
@@ -94,6 +94,12 @@ namespace UserManagementApi.Controllers
             {
                 return BadRequest($"Error: {ex.Message}");
             }
+        }
+
+        [HttpPut("login")]
+        public async Task<ActionResult> LoginAsync(LoginDTO loginDTO)
+        {
+            throw new NotImplementedException();
         }
 
     }

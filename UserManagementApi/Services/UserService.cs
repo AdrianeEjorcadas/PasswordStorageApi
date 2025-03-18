@@ -159,7 +159,40 @@ namespace UserManagementApi.Services
             };
 
             return await _userRepository.ResetPasswordAsync(userCredsModel, userId);
+        }
 
+        public async Task<string?> LoginAsync(LoginDTO loginDTO)
+        {
+            // get user credential info
+            var (userName, password, salt) = await _userRepository.GetUserCredentialAsync(loginDTO.EmailAddress);
+            // get user locked info
+            //var (isLocked, failedAttempt) = await _userRepository.IsUserLockedAsync(loginDTO.EmailAddress);
+
+            // check user credential values
+            if (userName is null || password is null || salt is null)
+                throw new ArgumentException("Incorrect email address or password");
+
+            //check DTO password structure
+            if (!CustomPasswordValidator.IsValid(loginDTO.Password, out string errorMessage))
+                throw new ArgumentException(errorMessage);
+
+            // hash DTO password 
+            var byteSalt = Convert.FromBase64String(salt);
+            var hashedInputPassword = HashingHelper.HashPassword(loginDTO.Password, byteSalt);
+
+            bool isUserLocked = await _userRepository.IsUserLockedAsync(loginDTO.EmailAddress);
+
+            if (!hashedInputPassword.Equals(password, StringComparison.Ordinal))
+            {
+                if (isUserLocked)
+                {
+                    throw new ArgumentException("Your account has been locked due to security reasons. Please reset your password to regain access.");
+                }
+
+                await _userRepository.AddFailureCountAndLockedAccount(loginDTO.EmailAddress);
+            }
+
+            return "authToken";
         }
     }
 

@@ -47,6 +47,39 @@ namespace UserManagementApi.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
         }
+        public async Task<bool> IsUserLockedAsync(string email)
+        {
+            var result = await _context.Users
+                .Where(u => u.Email == email)
+                .Select(u => new { u.IsLocked, u.FailedLoginAttempts })
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            int threshold = 5;
+
+            if (result.IsLocked ||  result.FailedLoginAttempts >= threshold)
+                return true;
+
+            return false;
+        }
+
+        public async Task AddFailureCountAndLockedAccount(string email)
+        {
+            var result = await _context.Users
+                .Where(u => u.Email == email)
+                .FirstOrDefaultAsync();
+
+            if (result.FailedLoginAttempts < 5)
+            {
+                result.FailedLoginAttempts += 1;
+            }
+            else
+            {
+                result.IsLocked = true;
+            }
+
+            await _context.SaveChangesAsync();
+        }
 
         public async Task<UserCredentialModel> CreateUserAsync(UserCredentialModel userModel)
         {
@@ -69,6 +102,22 @@ namespace UserManagementApi.Repositories
             }
 
             return (result.Token, result.UserId, result.ExpirationDateTime);
+        }
+
+        public async Task<(string? username, string? password, string? salt)> GetUserCredentialAsync(string email)
+        {
+            var result = await _context.Users
+                .Where(u => u.Email == email)
+                .Select(u => new { u.UserName, u.Password, u.Salt })
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if(result == null)
+            {
+                return (null, null, null);
+            }
+
+            return (result.UserName, result.Password, result.Password);
         }
 
         public async Task<UserCredentialModel> ChangePasswordAsync(UserCredentialModel userCredentialModel, Guid userId)
