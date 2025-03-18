@@ -7,6 +7,8 @@ namespace UserManagementApi.Data
     {
         public DbSet<UserCredentialModel> Users { get; set; }
         public DbSet<UserPasswordResetModel> UserPasswordResets { get; set; }
+        public DbSet<AuthenticationTokenModel> AuthenticationTokens { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -14,6 +16,7 @@ namespace UserManagementApi.Data
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<UserCredentialModel>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<UserPasswordResetModel>().HasQueryFilter(e => !e.IsUsed);
+            modelBuilder.Entity<AuthenticationTokenModel>().HasQueryFilter(e => !e.IsRevoked);
         }
 
         public override int SaveChanges()
@@ -51,6 +54,11 @@ namespace UserManagementApi.Data
                 {
                     passwordReset.TokenId = Guid.NewGuid();
                     passwordReset.ExpirationDateTime = currentTime.AddMinutes(10);
+                }
+                else if(entry.Entity is AuthenticationTokenModel authenticationToken)
+                {
+                    authenticationToken.Id = Guid.NewGuid();
+                    authenticationToken.CreatedAt = currentTime;
                 }
             }
         }

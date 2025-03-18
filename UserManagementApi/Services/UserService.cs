@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography;
+using System.Text;
 using UserManagementApi.DTO;
 using UserManagementApi.Helpers;
 using UserManagementApi.Models;
@@ -134,6 +135,7 @@ namespace UserManagementApi.Services
             if (tokenRetrieved is null)
                 throw new ArgumentException("Invalid or missing reset token. Please ensure you are using the correct link or request a new password reset.");
 
+            // token comparison (Note. will replace stringcomparison to CryptographicOperations.FixedTimeEquals)
             if (!tokenRetrieved.Equals(hashedToken, StringComparison.Ordinal))
                 throw new ArgumentException("The reset token is invalid or has expired. Please request a new password reset link.");
 
@@ -165,8 +167,6 @@ namespace UserManagementApi.Services
         {
             // get user credential info
             var (userName, password, salt) = await _userRepository.GetUserCredentialAsync(loginDTO.EmailAddress);
-            // get user locked info
-            //var (isLocked, failedAttempt) = await _userRepository.IsUserLockedAsync(loginDTO.EmailAddress);
 
             // check user credential values
             if (userName is null || password is null || salt is null)
@@ -180,15 +180,15 @@ namespace UserManagementApi.Services
             var byteSalt = Convert.FromBase64String(salt);
             var hashedInputPassword = HashingHelper.HashPassword(loginDTO.Password, byteSalt);
 
+            // check if user accout was locked
             bool isUserLocked = await _userRepository.IsUserLockedAsync(loginDTO.EmailAddress);
+            if (isUserLocked)
+                throw new ArgumentException("Your account has been locked due to security reasons. Please reset your password to regain access.");
 
-            if (!hashedInputPassword.Equals(password, StringComparison.Ordinal))
+            // compare passwords
+            if (CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(password), Convert.FromBase64String(hashedInputPassword)))
             {
-                if (isUserLocked)
-                {
-                    throw new ArgumentException("Your account has been locked due to security reasons. Please reset your password to regain access.");
-                }
-
+                // add login attempts count
                 await _userRepository.AddFailureCountAndLockedAccount(loginDTO.EmailAddress);
             }
 
