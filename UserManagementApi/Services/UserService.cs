@@ -168,7 +168,7 @@ namespace UserManagementApi.Services
             return user;
         }
 
-        public async Task<string?> LoginAsync(LoginDTO loginDTO)
+        public async Task<string> LoginAsync(LoginDTO loginDTO)
         {
             // get user credential info
             var (userName, password, salt) = await _userRepository.GetUserCredentialAsync(loginDTO.EmailAddress);
@@ -193,12 +193,12 @@ namespace UserManagementApi.Services
             // compare passwords
             if (!CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(password), Convert.FromBase64String(hashedInputPassword)))
             {
-                // add login attempts count
+                // add login failure counter
                 await _userRepository.AddFailureCountAndLockedAccount(loginDTO.EmailAddress);
-                throw new ArgumentException("Incorrect email address or password");
+                throw new ArgumentException("The email address or password you entered is incorrect. Please try again.");
             }
 
-            // reset the login failure count
+            // reset the login failure counter
             await _userRepository.ResetAccountLocked(loginDTO.EmailAddress);
             return "authToken";
         }
