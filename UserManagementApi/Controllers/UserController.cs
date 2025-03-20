@@ -31,7 +31,7 @@ namespace UserManagementApi.Controllers
             }
             catch (Exception ex) 
             {
-                return BadRequest($"Error: {ex.Message}");
+                return StatusCode(500, new {ErrorMessage = "An unexpected error occured.", Details = ex.Message});
             }
         }
 
@@ -49,9 +49,9 @@ namespace UserManagementApi.Controllers
             {
                 return BadRequest(new { ErrorMessage = aex.Message });
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                return BadRequest($"Error: {ex.Message}");
+                return StatusCode(500, new { ErrorMessage = "An unexpected error occured.", Details = ex.Message });
             }
         }
 
@@ -69,9 +69,9 @@ namespace UserManagementApi.Controllers
             {
                 return BadRequest(new { ErrorMessage = aex.Message });
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                return BadRequest($"Error: {ex.Message}");
+                return StatusCode(500, new { ErrorMessage = "An unexpected error occured.", Details = ex.Message });
             }
         }
 
@@ -90,9 +90,10 @@ namespace UserManagementApi.Controllers
             catch (ArgumentException aex)
             {
                 return BadRequest(new {ErrorMessage=aex.Message});
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
-                return BadRequest($"Error: {ex.Message}");
+                return StatusCode(500, new { ErrorMessage = "An unexpected error occured.", Details = ex.Message });
             }
         }
 
@@ -104,15 +105,15 @@ namespace UserManagementApi.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
                 var token = await _userService.LoginAsync(loginDTO);
-                return Ok("Successfully Login");
+                return Ok(token);
             }
             catch (ArgumentException aex)
             {
                 return BadRequest(new { ErrorMessage = aex.Message });
             }
-            catch (Exception e) 
+            catch (Exception ex)
             {
-                return BadRequest($"Error: {e.Message}");
+                return StatusCode(500, new { ErrorMessage = "An unexpected error occured.", Details = ex.Message });
             }
         }
 

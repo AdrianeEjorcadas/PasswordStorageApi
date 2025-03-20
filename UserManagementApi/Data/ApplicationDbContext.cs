@@ -59,6 +59,8 @@ namespace UserManagementApi.Data
                 {
                     authenticationToken.Id = Guid.NewGuid();
                     authenticationToken.CreatedAt = currentTime;
+                    authenticationToken.AuthTokenExpiration = currentTime.AddMinutes(30);
+                    authenticationToken.RefreshTokenExpiration = currentTime.AddDays(3);
                 }
             }
         }

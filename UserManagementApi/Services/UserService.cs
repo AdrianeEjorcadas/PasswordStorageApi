@@ -168,13 +168,13 @@ namespace UserManagementApi.Services
             return user;
         }
 
-        public async Task<string> LoginAsync(LoginDTO loginDTO)
+        public async Task<AuthenticationTokenDetailsDTO> LoginAsync(LoginDTO loginDTO)
         {
             // get user credential info
-            var (userName, password, salt) = await _userRepository.GetUserCredentialAsync(loginDTO.EmailAddress);
+            var (userId, password, salt) = await _userRepository.GetUserCredentialAsync(loginDTO.EmailAddress);
 
             // check user credential values
-            if (userName is null || password is null || salt is null)
+            if (userId == Guid.Empty || password is null || salt is null)
                 throw new ArgumentException("Incorrect email address or password");
 
             //check DTO password structure
@@ -200,7 +200,30 @@ namespace UserManagementApi.Services
 
             // reset the login failure counter
             await _userRepository.ResetAccountLocked(loginDTO.EmailAddress);
-            return "authToken";
+
+            //generate authentication token and refresh token
+            var authToken = HashingHelper.GenerateSalt(32);
+            var refreshToken = HashingHelper.GenerateSalt(32);
+
+            var hashedAuthToken = HashingHelper.HashToken(authToken);
+            var hashedRefreshToken = HashingHelper.HashToken(refreshToken);
+
+            var authTokenModel = new AuthenticationTokenModel
+            {
+                UserId = userId,
+                Token = hashedAuthToken,
+                RefreshToken = hashedRefreshToken
+            };
+
+            var result = await _userRepository.CreateAuthTokenAsync(authTokenModel);
+
+            return new AuthenticationTokenDetailsDTO
+            {
+                AuthToken = hashedAuthToken,
+                RefreshToken = hashedRefreshToken,
+                AuthTokenExpiration = result.AuthTokenExpiration,
+                RefreshTokenExpiration = result.RefreshTokenExpiration
+            };
         }
     }
 

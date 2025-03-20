@@ -19,7 +19,7 @@ namespace UserManagementApi.Repositories
 
         public Task<bool> IsUserLockedAsync(string email);
 
-        public Task<(string username, string password, string? salt)> GetUserCredentialAsync(string email); 
+        public Task<(Guid userId, string password, string? salt)> GetUserCredentialAsync(string email); 
 
         public Task<(string? retrievedToken, Guid userId, DateTime expirationDateTime)> GetTokenDetailsAsync(string token);
 
@@ -30,6 +30,8 @@ namespace UserManagementApi.Repositories
         public Task<bool> CreateResetTokenAsync(string email, string hashedToken);
 
         public Task<UserCredentialModel> ResetPasswordAsync(UserCredentialModel userCredentialModel, Guid userId);
+
+        public Task<AuthenticationTokenModel> CreateAuthTokenAsync(AuthenticationTokenModel authenticationTokenModel);
 
     }
 }

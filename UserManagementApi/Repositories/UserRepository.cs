@@ -115,20 +115,20 @@ namespace UserManagementApi.Repositories
             return (result.Token, result.UserId, result.ExpirationDateTime);
         }
 
-        public async Task<(string? username, string? password, string? salt)> GetUserCredentialAsync(string email)
+        public async Task<(Guid userId, string? password, string? salt)> GetUserCredentialAsync(string email)
         {
             var result = await _context.Users
                 .Where(u => u.Email == email)
-                .Select(u => new { u.UserName, u.Password, u.Salt })
+                .Select(u => new { u.Id, u.Password, u.Salt })
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
             if(result == null)
             {
-                return (null, null, null);
+                return (Guid.Empty, null, null);
             }
 
-            return (result.UserName, result.Password, result.Salt);
+            return (result.Id, result.Password, result.Salt);
         }
 
         public async Task<UserCredentialModel> ChangePasswordAsync(UserCredentialModel userCredentialModel, Guid userId)
@@ -179,6 +179,13 @@ namespace UserManagementApi.Repositories
             await _context.SaveChangesAsync();
 
             return passwordToUpdate;   
+        }
+
+        public async Task<AuthenticationTokenModel> CreateAuthTokenAsync(AuthenticationTokenModel authenticationTokenModel)
+        {
+            await _context.AddAsync(authenticationTokenModel);
+            await _context.SaveChangesAsync();
+            return authenticationTokenModel;
         }
     }
 }
