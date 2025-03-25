@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
+using UserManagementApi.CustomExceptions;
 using UserManagementApi.DTO;
+using UserManagementApi.Messages;
 using UserManagementApi.Models;
 using UserManagementApi.Services;
 
@@ -31,7 +34,7 @@ namespace UserManagementApi.Controllers
             }
             catch (Exception ex) 
             {
-                return StatusCode(500, new {ErrorMessage = "An unexpected error occured.", Details = ex.Message});
+                return StatusCode(500, new {ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message});
             }
         }
 
@@ -51,7 +54,7 @@ namespace UserManagementApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { ErrorMessage = "An unexpected error occured.", Details = ex.Message });
+                return StatusCode(500, new { ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message });
             }
         }
 
@@ -71,7 +74,7 @@ namespace UserManagementApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { ErrorMessage = "An unexpected error occured.", Details = ex.Message });
+                return StatusCode(500, new { ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message });
             }
         }
 
@@ -87,13 +90,16 @@ namespace UserManagementApi.Controllers
                 var userCreds = await _userService.ResetPasswordAsync(token, resetPasswordDTO);
                 return Ok("Your password has been successfully updated.");
             }
-            catch (ArgumentException aex)
+            catch (InvalidCredentialsException icx)
             {
-                return BadRequest(new {ErrorMessage=aex.Message});
+                return StatusCode(401, new {ErrorMessage=icx.Message});
+            } catch (TokenInvalidException tix)
+            {
+                return StatusCode(401, new { ErrorMessage = tix.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { ErrorMessage = "An unexpected error occured.", Details = ex.Message });
+                return StatusCode(500, new { ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message });
             }
         }
 
@@ -107,13 +113,36 @@ namespace UserManagementApi.Controllers
                 var token = await _userService.LoginAsync(loginDTO);
                 return Ok(token);
             }
-            catch (ArgumentException aex)
+            catch (InvalidCredentialsException icx)
             {
-                return BadRequest(new { ErrorMessage = aex.Message });
+                return StatusCode(401, new { ErrorMessage = icx.Message });
+            } catch(AccountLockedException alx)
+            {
+                return StatusCode(423, new {ErrorMessage = alx.Message});
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { ErrorMessage = "An unexpected error occured.", Details = ex.Message });
+                return StatusCode(500, new { ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message });
+            }
+        }
+
+        [HttpGet("validate-token")]
+        public async Task<ActionResult> ValidateTokenAsync()
+        {
+            try
+            {
+                var tokenWithBearer = Request.Headers["Authorization"].ToString();
+                var token = tokenWithBearer.Replace("Bearer ", "").Trim();
+                await _userService.ValidateTokenAsync(token);
+                return Ok();
+            }
+            catch (TokenInvalidException tx)
+            {
+                return StatusCode(401, new { ErrorMessage = tx.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message });
             }
         }
 

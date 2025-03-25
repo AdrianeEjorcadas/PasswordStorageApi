@@ -63,6 +63,22 @@ namespace UserManagementApi.Repositories
             return false;
         }
 
+        public async Task<bool> IsRefreshExpiredAsync(string refToken)
+        {
+            var result = await _context.AuthenticationTokens
+                .Where(a => a.RefreshToken == refToken)
+                .Select(a => new { a.RefreshTokenExpiration })
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if (result.RefreshTokenExpiration > DateTime.UtcNow)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public async Task AddFailureCountAndLockedAccount(string email)
         {
             var result = await _context.Users
@@ -186,6 +202,34 @@ namespace UserManagementApi.Repositories
             await _context.AddAsync(authenticationTokenModel);
             await _context.SaveChangesAsync();
             return authenticationTokenModel;
+        
+        
+        }
+
+        public Task<AuthenticationTokenModel> RegenerateAuthTokenAsync(string refToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ValidateAuthToken> GetAuthenticationTokenDetailsAsync(string token)
+        {
+            var result = await _context.AuthenticationTokens
+                .Where(a => a.Token == token)
+                .Select(a => new {a.UserId, a.RefreshToken, a.AuthTokenExpiration, a.RefreshTokenExpiration, a.IsRevoked })
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if (result is null)
+                return null;
+
+            return new ValidateAuthToken
+            {
+                UserId = result.UserId,
+                RefreshToken = result.RefreshToken,
+                AuthTokenExpiration = result.AuthTokenExpiration,
+                RefreshTokenExpiration = result.RefreshTokenExpiration,
+                IsRevoked = result.IsRevoked
+            };
         }
     }
 }

@@ -1,7 +1,10 @@
-﻿using System.Security.Cryptography;
+﻿using System.Numerics;
+using System.Security.Cryptography;
 using System.Text;
+using UserManagementApi.CustomExceptions;
 using UserManagementApi.DTO;
 using UserManagementApi.Helpers;
+using UserManagementApi.Messages;
 using UserManagementApi.Models;
 using UserManagementApi.Repositories;
 using UserManagementApi.Utilities;
@@ -133,22 +136,22 @@ namespace UserManagementApi.Services
 
             //token checking
             if (tokenRetrieved is null)
-                throw new ArgumentException("Invalid or missing reset token. Please ensure you are using the correct link or request a new password reset.");
+                throw new TokenInvalidException(ErrorMessages.ResetTokenInvalid);
 
             // token comparison (Note. will replace stringcomparison to CryptographicOperations.FixedTimeEquals)
             if (!tokenRetrieved.Equals(hashedToken, StringComparison.Ordinal))
-                throw new ArgumentException("The reset token is invalid or has expired. Please request a new password reset link.");
+                throw new TokenInvalidException(ErrorMessages.ResetTokenInvalid);
 
             // expiration of token checking
             if (expirationDateTime == default || expirationDateTime < DateTime.UtcNow)
-                throw new ArgumentException("The reset token has expired. Please request a new password reset link.");
+                throw new TokenInvalidException(ErrorMessages.ResetTokenInvalid);
 
             // password checking
             if (!CustomPasswordValidator.IsValid(resetPasswordDTO.NewPassword, out string errorMessage))
                 throw new ArgumentException(errorMessage);
 
             if (!resetPasswordDTO.NewPassword.Equals(resetPasswordDTO.ConfirmPassword, StringComparison.Ordinal))
-                throw new ArgumentException("The new password and confirmation password you entered do not match.");
+                throw new InvalidCredentialsException(ErrorMessages.InvalidConfirmationCredential);
 
             // hashing new password
             var userSalt = await _userRepository.GetSaltAsync(userId);
@@ -175,7 +178,7 @@ namespace UserManagementApi.Services
 
             // check user credential values
             if (userId == Guid.Empty || password is null || salt is null)
-                throw new ArgumentException("Incorrect email address or password");
+                throw new ArgumentException(ErrorMessages.InvalidCredential);
 
             //check DTO password structure
             if (!CustomPasswordValidator.IsValid(loginDTO.Password, out string errorMessage))
@@ -188,14 +191,14 @@ namespace UserManagementApi.Services
             // check if user accout was locked
             bool isUserLocked = await _userRepository.IsUserLockedAsync(loginDTO.EmailAddress);
             if (isUserLocked)
-                throw new ArgumentException("Your account has been locked due to security reasons. Please reset your password to regain access.");
+                throw new AccountLockedException(ErrorMessages.AccountLocked);
 
             // compare passwords
             if (!CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(password), Convert.FromBase64String(hashedInputPassword)))
             {
                 // add login failure counter
                 await _userRepository.AddFailureCountAndLockedAccount(loginDTO.EmailAddress);
-                throw new ArgumentException("The email address or password you entered is incorrect. Please try again.");
+                throw new InvalidCredentialsException(ErrorMessages.InvalidCredential);
             }
 
             // reset the login failure counter
@@ -225,6 +228,25 @@ namespace UserManagementApi.Services
                 RefreshTokenExpiration = result.RefreshTokenExpiration
             };
         }
-    }
 
+        public async Task ValidateTokenAsync(string token)
+        {
+            var result = await _userRepository.GetAuthenticationTokenDetailsAsync(token);
+            if (result is null)
+                throw new TokenInvalidException(ErrorMessages.InvalidToken);
+
+            if (result.IsRevoked)
+                throw new TokenInvalidException(ErrorMessages.InvalidToken);
+
+            if (result.AuthTokenExpiration > DateTime.UtcNow)
+            {
+                bool isRefreshExpired = await _userRepository.IsRefreshExpiredAsync(result.RefreshToken);
+                if (isRefreshExpired)
+                {
+                    throw new TokenInvalidException(ErrorMessages.ExpiredSession);
+                }
+            }
+        }
+
+    }
 }

@@ -23,6 +23,10 @@ namespace UserManagementApi.Repositories
 
         public Task<(string? retrievedToken, Guid userId, DateTime expirationDateTime)> GetTokenDetailsAsync(string token);
 
+        Task <ValidateAuthToken> GetAuthenticationTokenDetailsAsync(string token);
+
+        Task<bool> IsRefreshExpiredAsync(string refToken);
+
         public Task<UserCredentialModel> CreateUserAsync(UserCredentialModel userModel);
 
         public Task<UserCredentialModel> ChangePasswordAsync(UserCredentialModel userCredentialModel, Guid userId);
@@ -32,6 +36,9 @@ namespace UserManagementApi.Repositories
         public Task<UserCredentialModel> ResetPasswordAsync(UserCredentialModel userCredentialModel, Guid userId);
 
         public Task<AuthenticationTokenModel> CreateAuthTokenAsync(AuthenticationTokenModel authenticationTokenModel);
+
+        public Task<AuthenticationTokenModel> RegenerateAuthTokenAsync(string refToken);
+
 
     }
 }
