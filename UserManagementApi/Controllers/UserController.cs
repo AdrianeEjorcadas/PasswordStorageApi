@@ -137,14 +137,22 @@ namespace UserManagementApi.Controllers
         {
             try
             {
+                if (!Request.Headers.ContainsKey("Authorization"))
+                {
+                    return BadRequest(new { ErrorMessage = "Authorization header is missing."});
+                }
                 var authTokenWithBearer = Request.Headers["Authorization"].ToString();
                 var authToken = authTokenWithBearer.Replace("Bearer ", "").Trim();
                 await _userService.ValidateTokenAsync(authToken);
                 return Ok();
             }
+            catch(RevokedTokenException rtx) 
+            {
+                return StatusCode(403, new { ErrorMessage =  rtx.Message }); // status 403 will end the user session
+            }
             catch (InvalidTokenException tx)
             {
-                return StatusCode(401, new { ErrorMessage = tx.Message });
+                return StatusCode(401, new { ErrorMessage = tx.Message }); // status 401 will be the trigger to generate new token to continue the session
             }
             catch (Exception ex)
             {

@@ -233,20 +233,22 @@ namespace UserManagementApi.Services
         {
             var result = await _userRepository.GetAuthenticationTokenDetailsAsync(authToken);
             if (result is null)
-                throw new InvalidTokenException(ErrorMessages.InvalidToken);
+                throw new RevokedTokenException(ErrorMessages.InvalidToken);
 
             if (result.IsRevoked)
-                throw new InvalidTokenException(ErrorMessages.InvalidToken);
+                throw new RevokedTokenException(ErrorMessages.InvalidToken);
 
             if (result.AuthTokenExpiration < DateTime.UtcNow)
             {
                 bool isRefreshExpired = await _userRepository.IsRefreshExpiredAsync(result.RefreshToken);
-                if (isRefreshExpired)
+                if (!isRefreshExpired)
                 {
-                    throw new InvalidTokenException(ErrorMessages.ExpiredSession);
+                    throw new InvalidCredentialsException(ErrorMessages.ExpiredSession);
                 }
             }
         }
+
+
 
     }
 }
