@@ -71,7 +71,7 @@ namespace UserManagementApi.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
-            if (result.RefreshTokenExpiration > DateTime.UtcNow)
+            if (result.RefreshTokenExpiration < DateTime.UtcNow)
             {
                 return true;
             }

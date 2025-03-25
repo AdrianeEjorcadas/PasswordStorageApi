@@ -1,10 +1,10 @@
 ﻿namespace UserManagementApi.CustomExceptions
 {
-    public class TokenInvalidException : Exception
+    public class InvalidTokenException : Exception
     {
         public int ErrorCode { get;}
 
-        public TokenInvalidException(string message) : base(message)
+        public InvalidTokenException(string message) : base(message)
         {
         }
     }

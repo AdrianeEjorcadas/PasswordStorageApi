@@ -32,17 +32,17 @@ namespace UserManagementApi.Services
 
             if (isUserExists)
             {
-                throw new ArgumentException("The user name you entered is already associated with an account.\nPlease use a different user name or log in to your existing account.");
+                throw new InvalidCredentialsException(ErrorMessages.UsernameExist);
             }
 
             if (isEmailExists) 
             {
-                throw new ArgumentException("The email address you entered is already associated with an account.\nPlease use a different email address or log in to your existing account.");
+                throw new InvalidCredentialsException(ErrorMessages.EmailExist);
             }
 
             if(!addUserDTO.Password.Equals(addUserDTO.ConfirmationPassword, StringComparison.Ordinal))
             {
-                throw new ArgumentException("Password and confirmation password do not match. Please ensure both fields are identical.");
+                throw new InvalidCredentialsException(ErrorMessages.InvalidConfirmationCredential);
             }
 
             if(!CustomPasswordValidator.IsValid(addUserDTO.Password, out string errorMessage))
@@ -76,18 +76,18 @@ namespace UserManagementApi.Services
 
             // check if null
             if (oldPassword is null || salt is null)
-                throw new ArgumentException("The password you entered is incorrect.");
+                throw new InvalidCredentialsException(ErrorMessages.InvalidPassword);
 
             // compare current password and user input current password
             if (!oldPassword.Equals(hashedInputedOldPassword, StringComparison.Ordinal))
             {
-                throw new ArgumentException("The password you entered is incorrect.");
+                throw new InvalidCredentialsException(ErrorMessages.InvalidPassword);
             }
 
             // compare new password and confirmation password
             if (!changePasswordDTO.NewPassword.Equals(changePasswordDTO.ConfirmationPassword, StringComparison.Ordinal))
             {
-                throw new ArgumentException("The new password and confirmation password you entered do not match.");
+                throw new  InvalidCredentialsException(ErrorMessages.InvalidConfirmationCredential);
             }
 
             var userModel = new UserCredentialModel
@@ -113,7 +113,7 @@ namespace UserManagementApi.Services
             //Validate if the reset token is registered to the db
             var isTokenRegister = await _userRepository.CreateResetTokenAsync(email, hashedToken);
             if (!isTokenRegister)
-                throw new Exception("Failed to register the reset token");
+                throw new Exception(ErrorMessages.TokenNotRegistered);
 
             // Generate reset link
             var resetLinkHelper = new ResetLinkHelper(_httpContextAccessor);
@@ -136,15 +136,15 @@ namespace UserManagementApi.Services
 
             //token checking
             if (tokenRetrieved is null)
-                throw new TokenInvalidException(ErrorMessages.ResetTokenInvalid);
+                throw new InvalidTokenException(ErrorMessages.ResetTokenInvalid);
 
             // token comparison (Note. will replace stringcomparison to CryptographicOperations.FixedTimeEquals)
             if (!tokenRetrieved.Equals(hashedToken, StringComparison.Ordinal))
-                throw new TokenInvalidException(ErrorMessages.ResetTokenInvalid);
+                throw new InvalidTokenException(ErrorMessages.ResetTokenInvalid);
 
             // expiration of token checking
             if (expirationDateTime == default || expirationDateTime < DateTime.UtcNow)
-                throw new TokenInvalidException(ErrorMessages.ResetTokenInvalid);
+                throw new InvalidTokenException(ErrorMessages.ResetTokenInvalid);
 
             // password checking
             if (!CustomPasswordValidator.IsValid(resetPasswordDTO.NewPassword, out string errorMessage))
@@ -229,21 +229,21 @@ namespace UserManagementApi.Services
             };
         }
 
-        public async Task ValidateTokenAsync(string token)
+        public async Task ValidateTokenAsync(string authToken)
         {
-            var result = await _userRepository.GetAuthenticationTokenDetailsAsync(token);
+            var result = await _userRepository.GetAuthenticationTokenDetailsAsync(authToken);
             if (result is null)
-                throw new TokenInvalidException(ErrorMessages.InvalidToken);
+                throw new InvalidTokenException(ErrorMessages.InvalidToken);
 
             if (result.IsRevoked)
-                throw new TokenInvalidException(ErrorMessages.InvalidToken);
+                throw new InvalidTokenException(ErrorMessages.InvalidToken);
 
-            if (result.AuthTokenExpiration > DateTime.UtcNow)
+            if (result.AuthTokenExpiration < DateTime.UtcNow)
             {
                 bool isRefreshExpired = await _userRepository.IsRefreshExpiredAsync(result.RefreshToken);
                 if (isRefreshExpired)
                 {
-                    throw new TokenInvalidException(ErrorMessages.ExpiredSession);
+                    throw new InvalidTokenException(ErrorMessages.ExpiredSession);
                 }
             }
         }

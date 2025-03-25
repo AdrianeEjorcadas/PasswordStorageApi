@@ -15,7 +15,7 @@ namespace UserManagementApi.Services
 
         public Task<AuthenticationTokenDetailsDTO> LoginAsync(LoginDTO loginDTO); 
 
-        Task ValidateTokenAsync(string token);
+        Task ValidateTokenAsync(string authToken);
 
 
     }

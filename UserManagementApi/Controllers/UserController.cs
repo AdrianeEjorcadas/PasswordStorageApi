@@ -48,9 +48,9 @@ namespace UserManagementApi.Controllers
                 await _userService.ChangePasswordAsync(changePasswordDTO);
                 return Ok("Your password has been successfully updated.");
             }
-            catch (ArgumentException aex)
+            catch (InvalidCredentialsException icx)
             {
-                return BadRequest(new { ErrorMessage = aex.Message });
+                return BadRequest(new { ErrorMessage = icx.Message });
             }
             catch (Exception ex)
             {
@@ -67,6 +67,10 @@ namespace UserManagementApi.Controllers
                     return BadRequest(ModelState);
                 await _userService.ForgotPasswordAsync(forgotPasswordDTO.EmailAddress);
                 return Ok("If the email exists, a password reset link has been sent.");
+            }
+            catch (InvalidCredentialsException iex)
+            {
+                return BadRequest(new { ErrorMessage = iex.Message });
             }
             catch (ArgumentException aex)
             {
@@ -93,7 +97,8 @@ namespace UserManagementApi.Controllers
             catch (InvalidCredentialsException icx)
             {
                 return StatusCode(401, new {ErrorMessage=icx.Message});
-            } catch (TokenInvalidException tix)
+            } 
+            catch (InvalidTokenException tix)
             {
                 return StatusCode(401, new { ErrorMessage = tix.Message });
             }
@@ -116,7 +121,8 @@ namespace UserManagementApi.Controllers
             catch (InvalidCredentialsException icx)
             {
                 return StatusCode(401, new { ErrorMessage = icx.Message });
-            } catch(AccountLockedException alx)
+            } 
+            catch(AccountLockedException alx)
             {
                 return StatusCode(423, new {ErrorMessage = alx.Message});
             }
@@ -131,12 +137,12 @@ namespace UserManagementApi.Controllers
         {
             try
             {
-                var tokenWithBearer = Request.Headers["Authorization"].ToString();
-                var token = tokenWithBearer.Replace("Bearer ", "").Trim();
-                await _userService.ValidateTokenAsync(token);
+                var authTokenWithBearer = Request.Headers["Authorization"].ToString();
+                var authToken = authTokenWithBearer.Replace("Bearer ", "").Trim();
+                await _userService.ValidateTokenAsync(authToken);
                 return Ok();
             }
-            catch (TokenInvalidException tx)
+            catch (InvalidTokenException tx)
             {
                 return StatusCode(401, new { ErrorMessage = tx.Message });
             }
