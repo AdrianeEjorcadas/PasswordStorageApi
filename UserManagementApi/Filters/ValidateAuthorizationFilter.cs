@@ -2,7 +2,7 @@
 
 namespace UserManagementApi.Filters
 {
-    public class ValidateAuthorization : ActionFilterAttribute, IAsyncAuthorizationFilter
+    public class ValidateAuthorizationFilter : ActionFilterAttribute, IAsyncAuthorizationFilter
     {
         public Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {

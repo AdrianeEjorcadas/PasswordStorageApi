@@ -30,13 +30,14 @@ builder.Services.AddTransient<SibEmailHelper>();
 // add http context
 builder.Services.AddHttpContextAccessor();
 
-// add custom filters
+// add global custom filters
 builder.Services.AddControllers(options => {
     options.Filters.Add<ValidateModelStateAttribute>(); // check model state
-    options.Filters.Add<ValidateTokenFilter>(); // validate the user token
 });
 
-
+//add local scope filter
+builder.Services.AddScoped<ValidateTokenFilter>();
+builder.Services.AddScoped<ValidateAuthorizationFilter>();
 
 //builder.Services.AddEndpointsApiExplorer(); // for minimal api
 

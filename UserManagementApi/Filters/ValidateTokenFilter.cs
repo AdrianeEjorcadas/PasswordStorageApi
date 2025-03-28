@@ -27,7 +27,7 @@ namespace UserManagementApi.Filters
                 var authTokenWithBearer = context.HttpContext.Request.Headers["Authorization"].ToString();
                 var authToken = authTokenWithBearer.Replace("Bearer ", "").Trim();
 
-                // Validate the token using the service
+                // Validate the token
                 await _userService.ValidateTokenAsync(authToken);
 
                 // Continue executing the action if the token is valid
