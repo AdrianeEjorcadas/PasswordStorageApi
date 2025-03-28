@@ -250,7 +250,7 @@ namespace UserManagementApi.Services
 
         public Task RefreshTokenAsync(string refreshToken)
         {
-
+            throw new NotImplementedException();
         }
 
 
