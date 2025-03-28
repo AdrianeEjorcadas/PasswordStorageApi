@@ -49,7 +49,7 @@ namespace PasswordStorageApi.Loggers
             // Build a log record string for the file with timestamp, log level, category, and message.
             var logRecord = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{logLevel}] {_categoryName}: {message}";
             // Write the log message to the file system, appending a new line.
-            File.AppendAllText(_logFilePath, logRecord + Environment.NewLine);
+            //File.AppendAllText(_logFilePath, logRecord + Environment.NewLine);
             // Write the log to SQL Server using EF Core.
             // Create a new service scope so that the DbContext is resolved in a scoped manner.
             using (var scope = _scopeFactory.CreateScope())

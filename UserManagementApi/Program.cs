@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using UserManagementApi.Data;
+using UserManagementApi.Filters;
 using UserManagementApi.Helpers;
 using UserManagementApi.Repositories;
 using UserManagementApi.Services;
@@ -28,6 +29,14 @@ builder.Services.AddTransient<SmtpEmailHelper>();
 builder.Services.AddTransient<SibEmailHelper>();
 // add http context
 builder.Services.AddHttpContextAccessor();
+
+// add custom filters
+builder.Services.AddControllers(options => {
+    options.Filters.Add<ValidateModelStateAttribute>(); // check model state
+    options.Filters.Add<ValidateTokenFilter>(); // validate the user token
+});
+
+
 
 //builder.Services.AddEndpointsApiExplorer(); // for minimal api
 

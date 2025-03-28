@@ -2,6 +2,7 @@
 using Swashbuckle.AspNetCore.Annotations;
 using UserManagementApi.CustomExceptions;
 using UserManagementApi.DTO;
+using UserManagementApi.Filters;
 using UserManagementApi.Messages;
 using UserManagementApi.Models;
 using UserManagementApi.Services;
@@ -19,12 +20,11 @@ namespace UserManagementApi.Controllers
         }
 
         [HttpPost("create-user")]
+        [ValidateModelState]
         public async Task<ActionResult<UserCredentialModel>> CreateUser([FromBody] AddUserDTO addUserDTO)
         {
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
                 var user = await _userService.CreateUserAsync(addUserDTO);
                 return Ok(user);
             }
@@ -39,12 +39,11 @@ namespace UserManagementApi.Controllers
         }
 
         [HttpPut("change-password")]
+        [ValidateModelState]
         public async Task<ActionResult> ChangePasswordAsync([FromBody] ChangePasswordDTO changePasswordDTO) 
         {
             try
             {
-                if (!ModelState.IsValid) 
-                    return BadRequest(ModelState);
                 await _userService.ChangePasswordAsync(changePasswordDTO);
                 return Ok("Your password has been successfully updated.");
             }
@@ -59,12 +58,11 @@ namespace UserManagementApi.Controllers
         }
 
         [HttpPost("forgot-password")]
+        [ValidateModelState]
         public async Task<ActionResult> ForgotPasswordAsync([FromBody] ForgotPasswordDTO forgotPasswordDTO)
         {
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
                 await _userService.ForgotPasswordAsync(forgotPasswordDTO.EmailAddress);
                 return Ok("If the email exists, a password reset link has been sent.");
             }
@@ -83,14 +81,13 @@ namespace UserManagementApi.Controllers
         }
 
         [HttpPost("reset-password")]
+        [ValidateModelState]
         public async Task<ActionResult> ResetPasswordAsync(
                         [FromQuery] string token, 
                         [FromBody] ResetPasswordDTO resetPasswordDTO)
         {
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
                 var userCreds = await _userService.ResetPasswordAsync(token, resetPasswordDTO);
                 return Ok("Your password has been successfully updated.");
             }
@@ -109,57 +106,88 @@ namespace UserManagementApi.Controllers
         }
 
         [HttpPut("login")]
+        [ValidateModelState]
         public async Task<ActionResult> LoginAsync(LoginDTO loginDTO)
         {
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
                 var token = await _userService.LoginAsync(loginDTO);
                 return Ok(token);
             }
-            catch (InvalidCredentialsException icx)
+            catch (InvalidCredentialsException ex)
             {
-                return StatusCode(401, new { ErrorMessage = icx.Message });
+                return StatusCode(401, new ErrorResponse
+                {
+                    StatusCode = 401,
+                    ErrorMessage = ex.Message
+                });
             } 
-            catch(AccountLockedException alx)
+            catch(AccountLockedException ex)
             {
-                return StatusCode(423, new {ErrorMessage = alx.Message});
+                return StatusCode(423, new ErrorResponse
+                {
+                    StatusCode = 423,
+                    ErrorMessage = ex.Message
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message });
+                return StatusCode(500, new ErrorResponse
+                {
+                    StatusCode = 500,
+                    ErrorMessage = ErrorMessages.ExceptionDefault,
+                    Details = ex.Message
+                });
             }
         }
 
-        [HttpGet("validate-token")]
-        public async Task<ActionResult> ValidateTokenAsync()
+        //[HttpGet("validate-token")]
+        //public async Task<ActionResult> ValidateTokenAsync()
+        //{
+        //    try
+        //    {
+        //        if (!Request.Headers.ContainsKey("Authorization"))
+        //        {
+        //            return BadRequest(new { ErrorMessage = "Authorization header is missing."});
+        //        }
+        //        var authTokenWithBearer = Request.Headers["Authorization"].ToString();
+        //        var authToken = authTokenWithBearer.Replace("Bearer ", "").Trim();
+        //        await _userService.ValidateTokenAsync(authToken);
+        //        return Ok();
+        //    }
+        //    catch(RevokedTokenException rtx) 
+        //    {
+        //        return StatusCode(403, new { ErrorMessage =  rtx.Message }); // status 403 will end the user session
+        //    }
+        //    catch (InvalidTokenException tx)
+        //    {
+        //        return StatusCode(401, new { ErrorMessage = tx.Message }); // status 401 will be the trigger to generate new token to continue the session
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message });
+        //    }
+        //}
+
+        [HttpPut("refresh-token")]
+        public async Task<ActionResult> RefreshTokenAsync()
         {
             try
             {
-                if (!Request.Headers.ContainsKey("Authorization"))
+                if (!Request.Headers.ContainsKey("RefreshAuth"))
                 {
-                    return BadRequest(new { ErrorMessage = "Authorization header is missing."});
+                    return BadRequest(new { ErrorMessage = "Authorization header is missing." });
                 }
                 var authTokenWithBearer = Request.Headers["Authorization"].ToString();
                 var authToken = authTokenWithBearer.Replace("Bearer ", "").Trim();
-                await _userService.ValidateTokenAsync(authToken);
+                await _userService.RefreshTokenAsync(authToken);
                 return Ok();
-            }
-            catch(RevokedTokenException rtx) 
-            {
-                return StatusCode(403, new { ErrorMessage =  rtx.Message }); // status 403 will end the user session
-            }
-            catch (InvalidTokenException tx)
-            {
-                return StatusCode(401, new { ErrorMessage = tx.Message }); // status 401 will be the trigger to generate new token to continue the session
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message });
+                return StatusCode(500, new { ErrorMessages = ErrorMessages.ExceptionDefault, Details = ex.Message });
             }
         }
-
     }
 }
 

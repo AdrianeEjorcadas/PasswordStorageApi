@@ -248,6 +248,11 @@ namespace UserManagementApi.Services
             }
         }
 
+        public Task RefreshTokenAsync(string refreshToken)
+        {
+
+        }
+
 
 
     }
