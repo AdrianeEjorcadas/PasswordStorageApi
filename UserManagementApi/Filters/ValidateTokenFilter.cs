@@ -24,7 +24,7 @@ namespace UserManagementApi.Filters
                     context.Result = new BadRequestObjectResult (new { ErrorMessage = "Authorization header is missing." });
                 }
                 // Extract the token
-                var authTokenWithBearer = context.HttpContext.Request.Headers["Authorization"].ToString();
+                var authTokenWithBearer = context.HttpContext.Request.Headers["Auth-Token"].ToString();
                 var authToken = authTokenWithBearer.Replace("Bearer ", "").Trim();
 
                 // Validate the token

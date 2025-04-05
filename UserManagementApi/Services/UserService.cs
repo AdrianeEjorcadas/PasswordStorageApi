@@ -248,9 +248,13 @@ namespace UserManagementApi.Services
             }
         }
 
-        public Task RefreshTokenAsync(string refreshToken)
+        public async Task GenerateNewTokenAsync(string refreshToken)
         {
-            throw new NotImplementedException();
+            var newRefToken = HashingHelper.GenerateSalt(32);
+            var hashedNewRefToken = HashingHelper.HashToken(newRefToken);
+
+            await _userRepository.RegenerateAuthTokenAsync(hashedNewRefToken, refreshToken);
+
         }
 
 

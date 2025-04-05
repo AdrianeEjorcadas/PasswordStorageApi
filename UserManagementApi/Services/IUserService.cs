@@ -17,7 +17,7 @@ namespace UserManagementApi.Services
 
         Task ValidateTokenAsync(string authToken);
 
-        Task RefreshTokenAsync(string refreshToken);
+        Task GenerateNewTokenAsync(string refreshToken);
 
 
     }

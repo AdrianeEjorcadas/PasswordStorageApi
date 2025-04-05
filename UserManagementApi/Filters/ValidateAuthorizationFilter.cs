@@ -1,13 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using UserManagementApi.Services;
 
 namespace UserManagementApi.Filters
 {
-    public class ValidateAuthorizationFilter : ActionFilterAttribute, IAsyncAuthorizationFilter
+    public class ValidateAuthorizationFilter : IAsyncAuthorizationFilter
     {
-        public Task OnAuthorizationAsync(AuthorizationFilterContext context)
+        private readonly IUserService _userService;
+        public ValidateAuthorizationFilter(IUserService userService)
         {
-            //if (!context.HttpContext.Request.Headers.TryGetValue("Auth-Role", out  var authorizationHeader)) {
-            throw new NotImplementedException();
+            _userService = userService;
+        }
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
+        {
+            try
+            {
+
+            }
+            catch (Exception ex) 
+            {
+                context.Result = new StatusCodeResult(500);
+            }
         }
     }
 }

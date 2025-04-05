@@ -206,9 +206,21 @@ namespace UserManagementApi.Repositories
         
         }
 
-        public Task<AuthenticationTokenModel> RegenerateAuthTokenAsync(string refToken)
+        public async Task<AuthenticationTokenModel> RegenerateAuthTokenAsync(string newRefToken, string refreshToken)
         {
-            throw new NotImplementedException();
+            var result = await _context.AuthenticationTokens
+                .Where(t => t.RefreshToken == refreshToken)
+                .FirstOrDefaultAsync();
+
+            if (result is null)
+            {
+                throw new InvalidOperationException("Refresh token not found!.");
+            }
+
+            result.RefreshToken = newRefToken;
+            await _context.SaveChangesAsync();
+
+            return result;
         }
 
         public async Task<ValidateAuthToken> GetAuthenticationTokenDetailsAsync(string token)
@@ -231,5 +243,7 @@ namespace UserManagementApi.Repositories
                 IsRevoked = result.IsRevoked
             };
         }
+
+ 
     }
 }

@@ -169,19 +169,23 @@ namespace UserManagementApi.Controllers
         //    }
         //}
 
-        [HttpPut("refresh-token")]
-        public async Task<ActionResult> RefreshTokenAsync()
+        [HttpPut("generate-new-token")]
+        public async Task<ActionResult> GenerateNewTokenAsync()
         {
             try
             {
-                if (!Request.Headers.ContainsKey("RefreshAuth"))
+                if (!Request.Headers.ContainsKey("Refresh-Token"))
                 {
                     return BadRequest(new { ErrorMessage = "Authorization header is missing." });
                 }
-                var authTokenWithBearer = Request.Headers["Authorization"].ToString();
-                var authToken = authTokenWithBearer.Replace("Bearer ", "").Trim();
-                await _userService.RefreshTokenAsync(authToken);
+                var refTokenWithBearer = Request.Headers["Refresh-Token"].ToString();
+                var refToken = refTokenWithBearer.Replace("Bearer ", "").Trim();
+                await _userService.GenerateNewTokenAsync(refToken);
                 return Ok();
+            }
+            catch(InvalidOperationException ex)
+            {
+                return StatusCode(400, new { ErrorMessage = ex.Message });
             }
             catch (Exception ex)
             {
