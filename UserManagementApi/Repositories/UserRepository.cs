@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using UserManagementApi.CustomExceptions;
 using UserManagementApi.Data;
 using UserManagementApi.DTO;
+using UserManagementApi.Messages;
 using UserManagementApi.Models;
 
 namespace UserManagementApi.Repositories
@@ -24,6 +26,12 @@ namespace UserManagementApi.Repositories
         {
             return await _context.Users
                 .AnyAsync(u => u.UserName == username);
+        }
+
+        public async Task<bool> IsUserIdExistAsync(Guid id)
+        {
+            return await _context.Users
+                .AnyAsync(u => u.Id == id);
         }
 
         public async Task<(string? oldPassword, string? salt)> GetOldPasswordAndSaltAsync(Guid userId)
@@ -244,6 +252,19 @@ namespace UserManagementApi.Repositories
             };
         }
 
- 
+        public async Task RevokedTokenAsync(AuthenticationTokenDetailsDTO tokenDetailsDTO)
+        {
+            var result = await _context.AuthenticationTokens
+                .Where(a => a.Token == tokenDetailsDTO.AuthToken && a.RefreshToken == tokenDetailsDTO.RefreshToken )
+                .FirstOrDefaultAsync();
+
+            if (result is null)
+                throw new InvalidTokenException(ErrorMessages.InvalidToken);
+
+            result.RevokeAt = DateTime.UtcNow;
+            result.IsRevoked = true;
+        }
+
+
     }
 }

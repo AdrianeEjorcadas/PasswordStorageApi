@@ -24,6 +24,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IUserService, UserService>();
 //add repo
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 //add email service
 builder.Services.AddTransient<SmtpEmailHelper>();
 builder.Services.AddTransient<SibEmailHelper>();

@@ -13,6 +13,7 @@
         
         // User account
         public const string InvalidCredential = "The email address or password you entered is incorrect. Please try again.";
+        public const string InvalidUser = "Invalid user. Please log in again to continue.";
         public const string AccountLocked = "Your account has been locked due to security reasons. Please reset your password to regain access.";
         public const string InvalidConfirmationCredential = "The new password and confirmation password you entered do not match.";
         public const string InvalidPassword = "The password you have entered does not match our records. Please verify your input and try again.";

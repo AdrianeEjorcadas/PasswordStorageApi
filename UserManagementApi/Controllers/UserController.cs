@@ -5,6 +5,7 @@ using UserManagementApi.DTO;
 using UserManagementApi.Filters;
 using UserManagementApi.Messages;
 using UserManagementApi.Models;
+using UserManagementApi.Repositories;
 using UserManagementApi.Services;
 
 namespace UserManagementApi.Controllers
@@ -14,9 +15,11 @@ namespace UserManagementApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService)
+        private readonly ISessionRepository _sessionRepository;
+        public UserController(IUserService userService, ISessionRepository sessionRepository)
         {
             _userService = userService;
+            _sessionRepository = sessionRepository;
         }
 
         [HttpPost("create-user")]
@@ -170,28 +173,67 @@ namespace UserManagementApi.Controllers
         //}
 
         [HttpPut("generate-new-token")]
-        public async Task<ActionResult> GenerateNewTokenAsync()
+        public async Task<ActionResult> GenerateNewTokenAsync([FromBody] string refreshToken)
         {
             try
             {
-                if (!Request.Headers.ContainsKey("Refresh-Token"))
-                {
-                    return BadRequest(new { ErrorMessage = "Authorization header is missing." });
-                }
-                var refTokenWithBearer = Request.Headers["Refresh-Token"].ToString();
-                var refToken = refTokenWithBearer.Replace("Bearer ", "").Trim();
-                await _userService.GenerateNewTokenAsync(refToken);
+                #region remove header process
+                //if (!Request.Headers.ContainsKey("Refresh-Token"))
+                //{
+                //    return BadRequest(new { ErrorMessage = "Authorization header is missing." });
+                //}
+                //var refTokenWithBearer = Request.Headers["Refresh-Token"].ToString();
+                //var refToken = refTokenWithBearer.Replace("Bearer ", "").Trim(); 
+                #endregion
+                await _userService.GenerateNewTokenAsync(refreshToken);
                 return Ok();
             }
             catch(InvalidOperationException ex)
             {
-                return StatusCode(400, new { ErrorMessage = ex.Message });
+                return StatusCode(400, new { ErrorMessages = ErrorMessages.ExceptionDefault, Details = ex.Message });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { ErrorMessages = ErrorMessages.ExceptionDefault, Details = ex.Message });
             }
         }
+
+        [HttpPut("logout")]
+        public async Task<ActionResult> LogoutAsync([FromBody] AuthenticationTokenDetailsDTO tokenDetailsDTO)
+        {
+            try
+            {
+                await _userService.LogoutAsync(tokenDetailsDTO);
+                await _sessionRepository.ClearHeaderAsync();
+                return Ok();
+            } 
+            catch (InvalidTokenException ex)
+            {
+                return StatusCode(403, new ErrorResponse
+                {
+                    StatusCode = 403,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (InvalidCredentialsException ex)
+            {
+                return StatusCode(401, new ErrorResponse
+                {
+                    StatusCode = 401,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ErrorResponse
+                {
+                    StatusCode = 500,
+                    ErrorMessage = ErrorMessages.ExceptionDefault,
+                    Details = ex.Message
+                });
+            }
+        }
+
     }
 }
 

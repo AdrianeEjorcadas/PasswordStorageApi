@@ -19,6 +19,6 @@ namespace UserManagementApi.Services
 
         Task GenerateNewTokenAsync(string refreshToken);
 
-
+        Task LogoutAsync(AuthenticationTokenDetailsDTO tokenDetailsDTO);
     }
 }

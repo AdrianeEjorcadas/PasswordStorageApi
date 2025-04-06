@@ -257,7 +257,20 @@ namespace UserManagementApi.Services
 
         }
 
+        public async Task LogoutAsync(AuthenticationTokenDetailsDTO tokenDetailsDTO)
+        {
+            //validate user
+            var validateUser = await _userRepository.GetAuthenticationTokenDetailsAsync(tokenDetailsDTO.AuthToken);
+            if (validateUser is null) 
+                throw new InvalidTokenException(ErrorMessages.InvalidToken);
 
+            var isUserIdValid = await _userRepository.IsUserIdExistAsync(validateUser.UserId);
+            if (!isUserIdValid)
+                throw new InvalidCredentialsException(ErrorMessages.InvalidUser);
+
+            //revoked token
+            await _userRepository.RevokedTokenAsync(tokenDetailsDTO);
+        }
 
     }
 }

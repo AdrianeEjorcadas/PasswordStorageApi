@@ -9,6 +9,8 @@ namespace UserManagementApi.Repositories
 
         Task<bool> IsUserExistAsync(string username);
 
+        Task<bool> IsUserIdExistAsync(Guid id);
+
         Task<(string? oldPassword, string? salt)> GetOldPasswordAndSaltAsync(Guid userId);
 
         Task AddFailureCountAndLockedAccount(string email);
@@ -39,7 +41,7 @@ namespace UserManagementApi.Repositories
 
         Task<AuthenticationTokenModel> RegenerateAuthTokenAsync(string newRefToken, string refreshToken);
 
-
+        Task RevokedTokenAsync(AuthenticationTokenDetailsDTO tokenDetailsDTO);
 
     }
 }
