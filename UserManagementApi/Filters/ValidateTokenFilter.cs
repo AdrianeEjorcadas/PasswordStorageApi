@@ -19,12 +19,12 @@ namespace UserManagementApi.Filters
             try
             {
                 // Check the header for auth token
-                if (!context.HttpContext.Request.Headers.ContainsKey("Auth-Token"))
+                if (!context.HttpContext.Request.Headers.ContainsKey("Authorization"))
                 {
                     context.Result = new BadRequestObjectResult (new { ErrorMessage = "Authorization header is missing." });
                 }
                 // Extract the token
-                var authTokenWithBearer = context.HttpContext.Request.Headers["Auth-Token"].ToString();
+                var authTokenWithBearer = context.HttpContext.Request.Headers["Authorization"].ToString();
                 var authToken = authTokenWithBearer.Replace("Bearer ", "").Trim();
 
                 // Validate the token

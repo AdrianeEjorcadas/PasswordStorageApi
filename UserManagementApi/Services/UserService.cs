@@ -60,7 +60,18 @@ namespace UserManagementApi.Services
                 Salt = Convert.ToBase64String(salt)
             };
 
-            return await _userRepository.CreateUserAsync(userModel);
+            var result = await _userRepository.CreateUserAsync(userModel);
+
+            //Send link via email
+            var subject = "Your Account Has Been Created – Welcome to My Life!";
+            var body = $"<p>Hello {addUserDTO.UserName}! <br>" +
+                       "<p>Your account has been successfully created! You are now part of My Life community.</p> <br>" +
+                       "<p>Click the button below to login and start exploring:</p> <br>" +
+                       $"<a href='#'>{addUserDTO.UserName}</a>";
+
+            await _emailService.SendEmail(addUserDTO.Email, subject, body);
+
+            return result;
         }
 
         public async Task<UserCredentialModel> ChangePasswordAsync(ChangePasswordDTO changePasswordDTO)

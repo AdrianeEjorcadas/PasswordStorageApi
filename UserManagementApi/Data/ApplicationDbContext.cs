@@ -8,6 +8,7 @@ namespace UserManagementApi.Data
         public DbSet<UserCredentialModel> Users { get; set; }
         public DbSet<UserPasswordResetModel> UserPasswordResets { get; set; }
         public DbSet<AuthenticationTokenModel> AuthenticationTokens { get; set; }
+        public DbSet<RolesModel> Roles { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
@@ -17,6 +18,18 @@ namespace UserManagementApi.Data
             modelBuilder.Entity<UserCredentialModel>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<UserPasswordResetModel>().HasQueryFilter(e => !e.IsUsed);
             modelBuilder.Entity<AuthenticationTokenModel>().HasQueryFilter(e => !e.IsRevoked);
+
+            // make table fields unique
+            modelBuilder.Entity<RolesModel>().HasIndex(e => e.RoleName).IsUnique();
+
+            // composite fields
+            modelBuilder.Entity<UserRolesModel>()
+                .HasKey(e => new { e.RoleId, e.UserId });
+
+            // foreign key fields
+            //modelBuilder.Entity<UserRolesModel>()
+            //    .HasOne(u => u.User)
+            //    .WithMany(r => r.Role)
         }
 
         public override int SaveChanges()

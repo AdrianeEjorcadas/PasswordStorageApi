@@ -263,6 +263,7 @@ namespace UserManagementApi.Repositories
 
             result.RevokeAt = DateTime.UtcNow;
             result.IsRevoked = true;
+            await _context.SaveChangesAsync();
         }
 
 

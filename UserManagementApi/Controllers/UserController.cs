@@ -173,6 +173,7 @@ namespace UserManagementApi.Controllers
         //}
 
         [HttpPut("generate-new-token")]
+        [ServiceFilter(typeof(ValidateTokenFilter))]
         public async Task<ActionResult> GenerateNewTokenAsync([FromBody] string refreshToken)
         {
             try
