@@ -7,8 +7,10 @@
 
         // Token and session
         public const string InvalidToken = "Your authentication token is invalid or has expired. Please log in again to continue.";
+        public const string ExpiredToken = "Your token is invalid or has expired. Please try again or contact your administrator.";
         public const string ExpiredSession = "Your session has been expired. Please log in again to continue";
         public const string ResetTokenInvalid = "Invalid or missing reset token. Please ensure you are using the correct link or request a new password reset.";
+        public const string ConfirmationTokenInvalid = "Invalid or missing confirmation token. Please ensure you are using the correct link.";
         public const string TokenNotRegistered = "Failed to register the reset token.";
         
         // User account

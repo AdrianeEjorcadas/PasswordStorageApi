@@ -1,6 +1,6 @@
 ﻿namespace UserManagementApi.DTO
 {
-    public class ValidateAuthToken
+    public class ValidateAuthTokenDTO
     {
         public Guid UserId { get; set; }
         public string AuthToken { get; set; }

@@ -41,6 +41,25 @@ namespace UserManagementApi.Controllers
             }
         }
 
+        [HttpPut("confirm-email")]
+        [ValidateModelState]
+        public async Task<ActionResult> ConfirmEmailAsync([FromQuery] ConfirmationEmailDTO confirmationDTO)
+        {
+            try
+            {
+                await _userService.ValidateEmailTokenAsync(confirmationDTO);    
+                return Ok();
+            }
+            catch (RevokedTokenException ex) 
+            {
+                return BadRequest(new { ErrorMessage = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message });
+            }
+        }
+
         [HttpPut("change-password")]
         [ValidateModelState]
         public async Task<ActionResult> ChangePasswordAsync([FromBody] ChangePasswordDTO changePasswordDTO) 
@@ -200,6 +219,7 @@ namespace UserManagementApi.Controllers
         }
 
         [HttpPut("logout")]
+        [ServiceFilter(typeof(ValidateTokenFilter))]
         public async Task<ActionResult> LogoutAsync([FromBody] AuthenticationTokenDetailsDTO tokenDetailsDTO)
         {
             try

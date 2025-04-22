@@ -52,26 +52,67 @@ namespace UserManagementApi.Services
 
             var salt = HashingHelper.GenerateSalt(16);
             var hashedPassword = HashingHelper.HashPassword(addUserDTO.Password, salt);
+
+            var confirmationToken = HashingHelper.GenerateSalt(32);
+            var hashedConfirmationToken = HashingHelper.HashToken(confirmationToken);
+
             var userModel = new UserCredentialModel
             {
                 UserName = addUserDTO.UserName,
                 Email = addUserDTO.Email,
                 Password = hashedPassword,
-                Salt = Convert.ToBase64String(salt)
+                Salt = Convert.ToBase64String(salt),
+                ConfirmationToken = hashedConfirmationToken
             };
 
             var result = await _userRepository.CreateUserAsync(userModel);
 
+            #region move to confirmation email endpoint
             //Send link via email
-            var subject = "Your Account Has Been Created – Welcome to My Life!";
-            var body = $"<p>Hello {addUserDTO.UserName}! <br>" +
-                       "<p>Your account has been successfully created! You are now part of My Life community.</p> <br>" +
-                       "<p>Click the button below to login and start exploring:</p> <br>" +
-                       $"<a href='#'>{addUserDTO.UserName}</a>";
+            //var subject = "Your Account Has Been Created – Welcome to My Life!";
+            //var body = $"<p>Hello {addUserDTO.UserName}! <br>" +
+            //           "<p>Your account has been successfully created! You are now part of My Life community.</p> <br>" +
+            //           "<p>Click the button below to login and start exploring:</p> <br>" +
+            //           $"<a href='#'>{addUserDTO.UserName}</a>";
+
+            //await _emailService.SendEmail(addUserDTO.Email, subject, body); 
+            #endregion
+            // Generate confirmation link
+            var resetLinkHelper = new ResetLinkHelper(_httpContextAccessor);
+            var confirmationLink = resetLinkHelper.GenerateConfirmationLink(hashedConfirmationToken);
+
+            //Send link for email confirmation
+            var subject = "Confirm Your Email - Action Required";
+            var body = $"<p>Hi {addUserDTO.UserName}, <br>" +
+                       "<p>Thank you for signing up! Please confirm your email address to activate your account.</p> <br>" +
+                       $"<p>Click the link to verify your email: </p>" +
+                       $"<a href='{confirmationLink}'>{confirmationLink}</a> <br>" +
+                       "<p>If you didn't request this, please ignore this email.</p><br>" +
+                       "<p>Your confirmation link will expire in <strong>24 hours</strong>, so verify your email soon!</p><br><br>" +
+                       "<p>Best Zacari Softier Corp.</p>";
 
             await _emailService.SendEmail(addUserDTO.Email, subject, body);
 
             return result;
+        }
+
+        public async Task ValidateEmailTokenAsync(ConfirmationEmailDTO confirmationEmailDTO)
+        {
+             var result =  await _userRepository.ValidateEmailTokenAsync(confirmationEmailDTO);
+
+            // Generate confirmation link
+            var resetLinkHelper = new ResetLinkHelper(_httpContextAccessor);
+            var loginLink = resetLinkHelper.GenerateLoginLink();
+
+            //Send link via email
+            var subject = "Your Account Has Been Created – Welcome to Zacari Softier!";
+            var body = $"<p>Hello {result.UserName}! <br>" +
+                       "<p>Your account has been successfully created! You are now part of Zacari Softier family.</p> <br>" +
+                       "<p>Click the button below to login and start exploring:</p> <br>" +
+                       $"<a href='{loginLink}'>{loginLink}</a> <br><br>" +
+                       "<p>Best Zacari Softier Corp.</p>";
+
+            await _emailService.SendEmail(result.Email, subject, body);
         }
 
         public async Task<UserCredentialModel> ChangePasswordAsync(ChangePasswordDTO changePasswordDTO)
@@ -131,7 +172,7 @@ namespace UserManagementApi.Services
             var resetLink = resetLinkHelper.GenerateResetLink(tokenString);
 
             //Send link via email
-            var subject = "Password Reset";
+            var subject = "Reset Your Password – Action Required";
             var body = $"Click the link to reset your password: <a href='{resetLink}'>{resetLink}</a>";
             await _emailService.SendEmail(email, subject, body);
 

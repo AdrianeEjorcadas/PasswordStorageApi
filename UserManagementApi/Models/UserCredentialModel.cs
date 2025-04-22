@@ -27,6 +27,13 @@ namespace UserManagementApi.Models
 
         public bool IsDeleted { get; set; }
 
+        public bool IsEmailConfirmed { get; set; }
+
+        public string? ConfirmationToken { get; set; }
+
+        [DataType(DataType.DateTime)]
+        public DateTime? ConfirmationTokenExpiration { get; set; }
+
         [Required]
         [DataType(DataType.DateTime)]
         public DateTime CreatedAt { get; set; }

@@ -15,7 +15,7 @@ namespace UserManagementApi.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<UserCredentialModel>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<UserCredentialModel>().HasQueryFilter(e => !e.IsDeleted && e.IsEmailConfirmed);
             modelBuilder.Entity<UserPasswordResetModel>().HasQueryFilter(e => !e.IsUsed);
             modelBuilder.Entity<AuthenticationTokenModel>().HasQueryFilter(e => !e.IsRevoked);
 
@@ -61,6 +61,8 @@ namespace UserManagementApi.Data
                     user.Id = Guid.NewGuid();
                     user.IsActive = true;
                     user.IsDeleted = false;
+                    user.IsEmailConfirmed = false;
+                    user.ConfirmationTokenExpiration = currentTime.AddDays(1);
                     user.CreatedAt = currentTime;
                 }
                 else if(entry.Entity is UserPasswordResetModel passwordReset)

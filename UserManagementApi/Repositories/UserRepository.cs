@@ -231,7 +231,7 @@ namespace UserManagementApi.Repositories
             return result;
         }
 
-        public async Task<ValidateAuthToken> GetAuthenticationTokenDetailsAsync(string token)
+        public async Task<ValidateAuthTokenDTO> GetAuthenticationTokenDetailsAsync(string token)
         {
             var result = await _context.AuthenticationTokens
                 .Where(a => a.Token == token)
@@ -242,7 +242,7 @@ namespace UserManagementApi.Repositories
             if (result is null)
                 return null;
 
-            return new ValidateAuthToken
+            return new ValidateAuthTokenDTO
             {
                 UserId = result.UserId,
                 RefreshToken = result.RefreshToken,
@@ -264,6 +264,23 @@ namespace UserManagementApi.Repositories
             result.RevokeAt = DateTime.UtcNow;
             result.IsRevoked = true;
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<UserCredentialModel> ValidateEmailTokenAsync(ConfirmationEmailDTO confirmationEmailDTO)
+        {
+            var result = await _context.Users.IgnoreQueryFilters()
+                .Where(u => !u.IsEmailConfirmed && u.ConfirmationToken == confirmationEmailDTO.ConfirmationToken && u.ConfirmationTokenExpiration > DateTime.UtcNow)
+                .FirstOrDefaultAsync();
+
+            if (result is null)
+                throw new RevokedTokenException(ErrorMessages.ConfirmationTokenInvalid);
+
+            result.IsEmailConfirmed = true;
+            result.ConfirmationToken = null;
+            result.ConfirmationTokenExpiration = null;
+            await _context.SaveChangesAsync();
+
+            return result;
         }
 
 

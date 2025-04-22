@@ -25,7 +25,7 @@ namespace UserManagementApi.Repositories
 
         Task<(string? retrievedToken, Guid userId, DateTime expirationDateTime)> GetTokenDetailsAsync(string token);
 
-        Task <ValidateAuthToken> GetAuthenticationTokenDetailsAsync(string token);
+        Task <ValidateAuthTokenDTO> GetAuthenticationTokenDetailsAsync(string token);
 
         Task<bool> IsRefreshExpiredAsync(string refToken);
 
@@ -42,6 +42,8 @@ namespace UserManagementApi.Repositories
         Task<AuthenticationTokenModel> RegenerateAuthTokenAsync(string newRefToken, string refreshToken);
 
         Task RevokedTokenAsync(AuthenticationTokenDetailsDTO tokenDetailsDTO);
+
+        Task<UserCredentialModel> ValidateEmailTokenAsync(ConfirmationEmailDTO confirmationEmailDTO);
 
     }
 }
