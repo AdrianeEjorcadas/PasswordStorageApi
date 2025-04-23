@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
 using UserManagementApi.CustomExceptions;
 using UserManagementApi.Data;
 using UserManagementApi.DTO;
@@ -10,10 +12,12 @@ namespace UserManagementApi.Repositories
     public class UserRepository : IUserRepository
     {
         private readonly ApplicationDbContext _context;
+        private readonly IDistributedCache _cache;
 
-        public UserRepository(ApplicationDbContext context)
+        public UserRepository(ApplicationDbContext context, IDistributedCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         public async Task<bool> IsEmailExistAsync(string email)
@@ -285,7 +289,14 @@ namespace UserManagementApi.Repositories
 
        public async Task<UserCredentialModel> ResendEmailTokenAsync(ResendConfirmationDTO resendConfirmationDTO, string confirmationToken)
         {
-            var result = await _context.Users.IgnoreQueryFilters()
+            
+            var cacheKey = $"User_{resendConfirmationDTO.Email}";
+
+            var cacheUserJson = await _cache.GetStringAsync(cacheKey);
+
+            UserCredentialModel? result = cacheUserJson != null 
+                ? JsonSerializer.Deserialize<UserCredentialModel>(cacheUserJson) 
+                : await _context.Users.IgnoreQueryFilters()
                 .Where(u => !u.IsEmailConfirmed && resendConfirmationDTO.Email == u.Email)
                 .FirstOrDefaultAsync();
 
@@ -295,6 +306,12 @@ namespace UserManagementApi.Repositories
             result.ConfirmationToken = confirmationToken;
             result.ConfirmationTokenExpiration = DateTime.UtcNow.AddDays(1);
             await _context.SaveChangesAsync();
+
+            //update cache
+            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(result), new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+            });
 
             return result;
         }
