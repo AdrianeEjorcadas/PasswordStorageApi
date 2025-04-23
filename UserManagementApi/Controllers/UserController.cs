@@ -60,6 +60,21 @@ namespace UserManagementApi.Controllers
             }
         }
 
+        
+        [HttpPut("resend-confirmation")]
+        [ValidateModelState]
+        public async Task<ActionResult> ResendConfirmationAsync([FromBody] ResendConfirmationDTO resendConfirmationDTO)
+        {
+            try
+            {
+                await _userService.ResendEmailTokenAsync(resendConfirmationDTO);
+                return Ok();
+            } catch(Exception ex)
+            {
+                return StatusCode(500, new { ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message });
+            }
+        }
+
         [HttpPut("change-password")]
         [ValidateModelState]
         public async Task<ActionResult> ChangePasswordAsync([FromBody] ChangePasswordDTO changePasswordDTO) 

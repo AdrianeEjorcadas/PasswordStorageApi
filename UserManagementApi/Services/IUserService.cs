@@ -9,6 +9,8 @@ namespace UserManagementApi.Services
 
         Task ValidateEmailTokenAsync(ConfirmationEmailDTO confirmationEmailDTO);
 
+        Task ResendEmailTokenAsync(ResendConfirmationDTO resendConfirmationDTO);
+
         Task<UserCredentialModel> ChangePasswordAsync(ChangePasswordDTO changePasswordDTO);
 
         Task<bool> ForgotPasswordAsync(string email);

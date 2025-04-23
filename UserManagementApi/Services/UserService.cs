@@ -115,6 +115,32 @@ namespace UserManagementApi.Services
             await _emailService.SendEmail(result.Email, subject, body);
         }
 
+        public async Task ResendEmailTokenAsync(ResendConfirmationDTO resendConfirmationDTO)
+        {
+            //generate new confirmation token
+            var confirmationToken = HashingHelper.GenerateSalt(32);
+            var hashedConfirmationToken = HashingHelper.HashToken(confirmationToken);
+
+            // validate the email address and update the confirmation token
+            var result = await _userRepository.ResendEmailTokenAsync(resendConfirmationDTO, hashedConfirmationToken);
+
+            // Generate confirmation link
+            var resetLinkHelper = new ResetLinkHelper(_httpContextAccessor);
+            var confirmationLink = resetLinkHelper.GenerateConfirmationLink(hashedConfirmationToken);
+
+            //Send link for email confirmation
+            var subject = "Confirm Your Email - Action Required";
+            var body = $"<p>Hi {result.UserName}, <br>" +
+                       "<p>Thank you for signing up! Please confirm your email address to activate your account.</p> <br>" +
+                       $"<p>Click the link to verify your email: </p>" +
+                       $"<a href='{confirmationLink}'>{confirmationLink}</a> <br>" +
+                       "<p>If you didn't request this, please ignore this email.</p><br>" +
+                       "<p>Your confirmation link will expire in <strong>24 hours</strong>, so verify your email soon!</p><br><br>" +
+                       "<p>Best Zacari Softier Corp.</p>";
+
+            await _emailService.SendEmail(result.Email, subject, body);
+        }
+
         public async Task<UserCredentialModel> ChangePasswordAsync(ChangePasswordDTO changePasswordDTO)
         {
             // retrieve current password and salt

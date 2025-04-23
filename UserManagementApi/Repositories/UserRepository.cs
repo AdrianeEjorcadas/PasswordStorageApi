@@ -269,7 +269,7 @@ namespace UserManagementApi.Repositories
         public async Task<UserCredentialModel> ValidateEmailTokenAsync(ConfirmationEmailDTO confirmationEmailDTO)
         {
             var result = await _context.Users.IgnoreQueryFilters()
-                .Where(u => !u.IsEmailConfirmed && u.ConfirmationToken == confirmationEmailDTO.ConfirmationToken && u.ConfirmationTokenExpiration > DateTime.UtcNow)
+                .Where(u => !u.IsEmailConfirmed && u.ConfirmationToken == confirmationEmailDTO.ConfirmationToken && u.ConfirmationTokenExpiration > DateTime.UtcNow && !u.IsDeleted)
                 .FirstOrDefaultAsync();
 
             if (result is null)
@@ -278,6 +278,22 @@ namespace UserManagementApi.Repositories
             result.IsEmailConfirmed = true;
             result.ConfirmationToken = null;
             result.ConfirmationTokenExpiration = null;
+            await _context.SaveChangesAsync();
+
+            return result;
+        }
+
+       public async Task<UserCredentialModel> ResendEmailTokenAsync(ResendConfirmationDTO resendConfirmationDTO, string confirmationToken)
+        {
+            var result = await _context.Users.IgnoreQueryFilters()
+                .Where(u => !u.IsEmailConfirmed && resendConfirmationDTO.Email == u.Email)
+                .FirstOrDefaultAsync();
+
+            if (result is null)
+                throw new RevokedTokenException(ErrorMessages.ConfirmationTokenInvalid);
+
+            result.ConfirmationToken = confirmationToken;
+            result.ConfirmationTokenExpiration = DateTime.UtcNow.AddDays(1);
             await _context.SaveChangesAsync();
 
             return result;

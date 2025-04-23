@@ -45,5 +45,7 @@ namespace UserManagementApi.Repositories
 
         Task<UserCredentialModel> ValidateEmailTokenAsync(ConfirmationEmailDTO confirmationEmailDTO);
 
+        Task<UserCredentialModel> ResendEmailTokenAsync(ResendConfirmationDTO resendConfirmationDTO, string confirmationToken);
+
     }
 }
