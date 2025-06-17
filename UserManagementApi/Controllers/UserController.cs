@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Net;
 using UserManagementApi.CustomExceptions;
 using UserManagementApi.DTO;
 using UserManagementApi.Filters;
@@ -24,20 +26,37 @@ namespace UserManagementApi.Controllers
 
         [HttpPost("create-user")]
         [ValidateModelState]
-        public async Task<ActionResult<UserCredentialModel>> CreateUser([FromBody] AddUserDTO addUserDTO)
+        public async Task<ActionResult<ReturnResponse<UserCredentialModel>>> CreateUser([FromBody] AddUserDTO addUserDTO)
         {
             try
             {
                 var user = await _userService.CreateUserAsync(addUserDTO);
-                return Ok(user);
+                var response = new ReturnResponse<UserCredentialModel> 
+                { 
+                    StatusCode = 201,
+                    Message = "User created successfully",
+                    Data = null
+                };
+            
+                return StatusCode(response.StatusCode, response);
             }
             catch (ArgumentException aex)
             {
-                return BadRequest(new { ErrorMessage = aex.Message });
+                return BadRequest(new ReturnResponse<object>
+                {
+                    StatusCode = 400,
+                    Message = aex.Message,
+                    Data = null
+                });
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                return StatusCode(500, new {ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message});
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ReturnResponse<object>
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Message = "An unexpected error occurred",
+                    Data = new { ExceptionMessage = ex.Message, StackTrace = ex.StackTrace }
+                });
             }
         }
 
@@ -47,16 +66,32 @@ namespace UserManagementApi.Controllers
         {
             try
             {
-                await _userService.ValidateEmailTokenAsync(confirmationDTO);    
-                return Ok();
+                await _userService.ValidateEmailTokenAsync(confirmationDTO);
+
+                return Ok( new ReturnResponse<string>
+                {
+                    StatusCode = 200,
+                    Message = "Email confirmation successful",
+                    Data = null
+                });
             }
-            catch (RevokedTokenException ex) 
+            catch (RevokedTokenException ex)
             {
-                return BadRequest(new { ErrorMessage = ex.Message });
+                return BadRequest(new ReturnResponse<object>
+                {
+                    StatusCode = 400,
+                    Message = ex.Message,
+                    Data = null
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message });
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ReturnResponse<object>
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Message = "An unexpected error occurred",
+                    Data = new { ExceptionMessage = ex.Message, StackTrace = ex.StackTrace }
+                });
             }
         }
 
@@ -68,10 +103,20 @@ namespace UserManagementApi.Controllers
             try
             {
                 await _userService.ResendEmailTokenAsync(resendConfirmationDTO);
-                return Ok();
+                return Ok(new ReturnResponse<string>
+                {
+                    StatusCode = 200,
+                    Message = "Successfully resend the confirmation",
+                    Data = null
+                });
             } catch(Exception ex)
             {
-                return StatusCode(500, new { ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message });
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ReturnResponse<object>
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Message = "An unexpected error occurred",
+                    Data = new { ExceptionMessage = ex.Message, StackTrace = ex.StackTrace }
+                });
             }
         }
 
@@ -82,15 +127,30 @@ namespace UserManagementApi.Controllers
             try
             {
                 await _userService.ChangePasswordAsync(changePasswordDTO);
-                return Ok("Your password has been successfully updated.");
+                return Ok(new ReturnResponse<string>
+                {
+                    StatusCode = 200,
+                    Message = "Your password has been successfully updated.",
+                    Data = null
+                });
             }
-            catch (InvalidCredentialsException icx)
+            catch (InvalidCredentialsException ex)
             {
-                return BadRequest(new { ErrorMessage = icx.Message });
+                return BadRequest(new ReturnResponse<object>
+                {
+                    StatusCode = 400,
+                    Message = ex.Message,
+                    Data = null
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message });
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ReturnResponse<object>
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Message = "An unexpected error occurred",
+                    Data = new { ExceptionMessage = ex.Message, StackTrace = ex.StackTrace }
+                });
             }
         }
 
@@ -101,19 +161,39 @@ namespace UserManagementApi.Controllers
             try
             {
                 await _userService.ForgotPasswordAsync(forgotPasswordDTO.EmailAddress);
-                return Ok("If the email exists, a password reset link has been sent.");
+                return Ok(new ReturnResponse<string>
+                {
+                    StatusCode = 200,
+                    Message = "If the email exists, a password reset link has been sent.",
+                    Data = null
+                });
             }
-            catch (InvalidCredentialsException iex)
+            catch (InvalidCredentialsException ex)
             {
-                return BadRequest(new { ErrorMessage = iex.Message });
+                return BadRequest(new ReturnResponse<object>
+                {
+                    StatusCode = 400,
+                    Message = ex.Message,
+                    Data = null
+                });
             }
-            catch (ArgumentException aex)
+            catch (ArgumentException ex)
             {
-                return BadRequest(new { ErrorMessage = aex.Message });
+                return BadRequest(new ReturnResponse<object>
+                {
+                    StatusCode = 400,
+                    Message = ex.Message,
+                    Data = null
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message });
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ReturnResponse<object>
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Message = "An unexpected error occurred",
+                    Data = new { ExceptionMessage = ex.Message, StackTrace = ex.StackTrace }
+                });
             }
         }
 
@@ -126,19 +206,39 @@ namespace UserManagementApi.Controllers
             try
             {
                 var userCreds = await _userService.ResetPasswordAsync(token, resetPasswordDTO);
-                return Ok("Your password has been successfully updated.");
+                return Ok(new ReturnResponse<string>
+                {
+                    StatusCode = 200,
+                    Message = "Your password has been successfully updated.",
+                    Data = null
+                });
             }
-            catch (InvalidCredentialsException icx)
+            catch (InvalidCredentialsException ex)
             {
-                return StatusCode(401, new {ErrorMessage=icx.Message});
+                return StatusCode(401, new ReturnResponse<object>
+                {
+                    StatusCode = 401,
+                    Message = ex.Message,
+                    Data = ex.Data
+                });
             } 
-            catch (InvalidTokenException tix)
+            catch (InvalidTokenException ex)
             {
-                return StatusCode(401, new { ErrorMessage = tix.Message });
+                return StatusCode(401, new ReturnResponse<object>
+                {
+                    StatusCode = 401,
+                    Message = ex.Message,
+                    Data = ex.Data
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { ErrorMessage = ErrorMessages.ExceptionDefault, Details = ex.Message });
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ReturnResponse<object>
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Message = "An unexpected error occurred",
+                    Data = new { ExceptionMessage = ex.Message, StackTrace = ex.StackTrace }
+                });
             }
         }
 
@@ -149,31 +249,38 @@ namespace UserManagementApi.Controllers
             try
             {
                 var token = await _userService.LoginAsync(loginDTO);
-                return Ok(token);
+                return Ok(new ReturnResponse<object>
+                {
+                    StatusCode = (int)(HttpStatusCode.OK),
+                    Message = "Login Successfully",
+                    Data = new { token }
+                });
             }
             catch (InvalidCredentialsException ex)
             {
-                return StatusCode(401, new ErrorResponse
+                return StatusCode((int)HttpStatusCode.Unauthorized, new ReturnResponse<object>
                 {
-                    StatusCode = 401,
-                    ErrorMessage = ex.Message
+                    StatusCode = (int)(HttpStatusCode.Unauthorized),
+                    Message = "Login Error",
+                    Data = new { Error = ex.Message }
                 });
             } 
             catch(AccountLockedException ex)
             {
-                return StatusCode(423, new ErrorResponse
+                return StatusCode((int)HttpStatusCode.Locked, new ReturnResponse<object>
                 {
-                    StatusCode = 423,
-                    ErrorMessage = ex.Message
+                    StatusCode = (int)HttpStatusCode.Locked,
+                    Message = "Account Locked",
+                    Data = new { Error = ex.Message }
                 });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new ErrorResponse
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ReturnResponse<object>
                 {
-                    StatusCode = 500,
-                    ErrorMessage = ErrorMessages.ExceptionDefault,
-                    Details = ex.Message
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Message = "An unexpected error occurred",
+                    Data = new { ExceptionMessage = ex.Message, StackTrace = ex.StackTrace }
                 });
             }
         }
@@ -221,15 +328,30 @@ namespace UserManagementApi.Controllers
                 //var refToken = refTokenWithBearer.Replace("Bearer ", "").Trim(); 
                 #endregion
                 await _userService.GenerateNewTokenAsync(refreshToken);
-                return Ok();
+                return Ok(new ReturnResponse<string>
+                {
+                    StatusCode = (int)HttpStatusCode.OK,
+                    Message = "Generate new token",
+                    Data = null
+                });
             }
             catch(InvalidOperationException ex)
             {
-                return StatusCode(400, new { ErrorMessages = ErrorMessages.ExceptionDefault, Details = ex.Message });
+                return StatusCode((int)HttpStatusCode.BadRequest, new ReturnResponse<object>
+                {
+                    StatusCode = (int)HttpStatusCode.BadRequest,
+                    Message = "Invalida Operation",
+                    Data = new { Error = ex.Message }
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { ErrorMessages = ErrorMessages.ExceptionDefault, Details = ex.Message });
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ReturnResponse<object>
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Message = "An unexpected error occurred",
+                    Data = new { ExceptionMessage = ex.Message, StackTrace = ex.StackTrace }
+                });
             }
         }
 
@@ -241,31 +363,38 @@ namespace UserManagementApi.Controllers
             {
                 await _userService.LogoutAsync(tokenDetailsDTO);
                 await _sessionRepository.ClearHeaderAsync();
-                return Ok();
+                return Ok(new ReturnResponse<string>
+                {
+                    StatusCode = 200,
+                    Message = "Successfully Logout",
+                    Data = DateTime.UtcNow.ToString("o")
+                });
             } 
             catch (InvalidTokenException ex)
             {
-                return StatusCode(403, new ErrorResponse
+                return StatusCode((int)HttpStatusCode.Forbidden, new ReturnResponse<object>
                 {
-                    StatusCode = 403,
-                    ErrorMessage = ex.Message
+                    StatusCode = (int)HttpStatusCode.Forbidden,
+                    Message = "Invalid authentication token",
+                    Data = new {Error = ex.Message}
                 });
             }
             catch (InvalidCredentialsException ex)
             {
-                return StatusCode(401, new ErrorResponse
+                return StatusCode((int)HttpStatusCode.Unauthorized, new ReturnResponse<object>
                 {
-                    StatusCode = 401,
-                    ErrorMessage = ex.Message
+                    StatusCode = (int)HttpStatusCode.Unauthorized,
+                    Message = "Invalid credentials",
+                    Data = new { Error = ex.Message }
                 });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new ErrorResponse
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ReturnResponse<object>
                 {
-                    StatusCode = 500,
-                    ErrorMessage = ErrorMessages.ExceptionDefault,
-                    Details = ex.Message
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Message = "An unexpected error occurred",
+                    Data = new { ExceptionMessage = ex.Message, StackTrace = ex.StackTrace }
                 });
             }
         }

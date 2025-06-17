@@ -290,10 +290,13 @@ namespace UserManagementApi.Repositories
        public async Task<UserCredentialModel> ResendEmailTokenAsync(ResendConfirmationDTO resendConfirmationDTO, string confirmationToken)
         {
             
+            // cache key
             var cacheKey = $"User_{resendConfirmationDTO.Email}";
 
+            // get the JSON data using cache key
             var cacheUserJson = await _cache.GetStringAsync(cacheKey);
 
+            // get the data from cache or database
             UserCredentialModel? result = cacheUserJson != null 
                 ? JsonSerializer.Deserialize<UserCredentialModel>(cacheUserJson) 
                 : await _context.Users.IgnoreQueryFilters()

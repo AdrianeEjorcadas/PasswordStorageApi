@@ -333,7 +333,6 @@ namespace UserManagementApi.Services
             var hashedNewRefToken = HashingHelper.HashToken(newRefToken);
 
             await _userRepository.RegenerateAuthTokenAsync(hashedNewRefToken, refreshToken);
-
         }
 
         public async Task LogoutAsync(AuthenticationTokenDetailsDTO tokenDetailsDTO)
