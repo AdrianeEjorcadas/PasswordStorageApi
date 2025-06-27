@@ -14,10 +14,16 @@ namespace UserManagementApi.Repositories
         private readonly ApplicationDbContext _context;
         private readonly IDistributedCache _cache;
 
+
         public UserRepository(ApplicationDbContext context, IDistributedCache cache)
         {
             _context = context;
             _cache = cache;
+        }
+        public async Task<bool> IsEmailExistingAsync(string email)
+        {
+            return await _context.Users
+            .AnyAsync(u => u.Email == email);
         }
 
         public async Task<bool> IsEmailExistAsync(string email)

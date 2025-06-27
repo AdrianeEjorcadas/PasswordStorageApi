@@ -24,6 +24,31 @@ namespace UserManagementApi.Controllers
             _sessionRepository = sessionRepository;
         }
 
+        [HttpGet("email-exist")]
+        [ValidateModelState]
+        public async Task<ActionResult> IsEmailExistAsync(string email) 
+        {
+            try
+            {
+                var isEmailExist = await _userService.IsEmailExistingAsync(email);
+                return Ok(new ReturnResponse<object>
+                {
+                    StatusCode = (int)HttpStatusCode.OK,
+                    Message = "Email confirmation successful",
+                    Data = isEmailExist
+                });
+            }
+            catch (Exception ex) 
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ReturnResponse<object>
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Message = "An unexpected error occurred",
+                    Data = new { ExceptionMessage = ex.Message, StackTrace = ex.StackTrace }
+                });
+            }
+        }
+
         [HttpPost("create-user")]
         [ValidateModelState]
         public async Task<ActionResult<ReturnResponse<UserCredentialModel>>> CreateUser([FromBody] AddUserDTO addUserDTO)

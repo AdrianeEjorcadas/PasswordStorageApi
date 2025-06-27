@@ -5,6 +5,9 @@ namespace UserManagementApi.Repositories
 {
     public interface IUserRepository
     {
+
+        Task<bool> IsEmailExistingAsync(string email);
+
         Task<bool> IsEmailExistAsync(string email);
 
         Task<bool> IsUserExistAsync(string username);

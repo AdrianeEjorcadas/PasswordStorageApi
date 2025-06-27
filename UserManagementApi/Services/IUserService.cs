@@ -5,6 +5,8 @@ namespace UserManagementApi.Services
 {
     public interface IUserService
     {
+
+        Task<bool> IsEmailExistingAsync(string email);
         Task<UserCredentialModel> CreateUserAsync(AddUserDTO addUserDTO);
 
         Task ValidateEmailTokenAsync(ConfirmationEmailDTO confirmationEmailDTO);

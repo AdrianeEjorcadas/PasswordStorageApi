@@ -26,6 +26,11 @@ namespace UserManagementApi.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
+        public async Task<bool> IsEmailExistingAsync(string email)
+        {
+            return await _userRepository.IsEmailExistingAsync(email);
+        }
+
         public async Task<UserCredentialModel> CreateUserAsync(AddUserDTO addUserDTO)
         {
             var isUserExists = await _userRepository.IsUserExistAsync(addUserDTO.UserName);
