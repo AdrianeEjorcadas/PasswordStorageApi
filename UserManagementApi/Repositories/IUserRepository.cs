@@ -14,6 +14,8 @@ namespace UserManagementApi.Repositories
 
         Task<bool> IsUserIdExistAsync(Guid id);
 
+        Task<UsernameEmailDTO> GetUserData(Guid userId);
+
         Task<(string? oldPassword, string? salt)> GetOldPasswordAndSaltAsync(Guid userId);
 
         Task AddFailureCountAndLockedAccount(string email);

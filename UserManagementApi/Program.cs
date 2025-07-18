@@ -63,10 +63,11 @@ builder.Services.AddSwaggerGen(options =>
 //Add CORS - since i am getting an Httpconnectivity error
 //builder.Services.AddCors(options =>
 //{
-//    options.AddPolicy("AllowAllOrigins",
-//        builder => builder.AllowAnyOrigin()
-//                          .AllowAnyMethod()
-//                          .AllowAnyHeader());
+//    options.AddPolicy("AllowFrontEnd",
+//        policy => policy.WithOrigins("http://localhost:4200")
+//            .AllowAnyHeader()
+//            .AllowAnyMethod());
+
 //});
 
 builder.Services.AddCors(options =>

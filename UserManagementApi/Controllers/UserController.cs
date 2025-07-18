@@ -222,7 +222,7 @@ namespace UserManagementApi.Controllers
             }
         }
 
-        [HttpPost("reset-password")]
+        [HttpPut("reset-password")]
         [ValidateModelState]
         public async Task<ActionResult> ResetPasswordAsync(
                         [FromQuery] string token, 

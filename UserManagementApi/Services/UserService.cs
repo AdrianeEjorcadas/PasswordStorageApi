@@ -17,13 +17,16 @@ namespace UserManagementApi.Services
         private readonly IUserRepository _userRepository;
         private readonly SmtpEmailHelper _emailService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IConfiguration _configuration;
         public UserService(IUserRepository userRepository,
                             SmtpEmailHelper emailService,
-                            IHttpContextAccessor httpContextAccessor)
+                            IHttpContextAccessor httpContextAccessor,
+                            IConfiguration configuration)
         {
             _userRepository = userRepository;
             _emailService = emailService;
             _httpContextAccessor = httpContextAccessor;
+            _configuration = configuration;
         }
 
         public async Task<bool> IsEmailExistingAsync(string email)
@@ -84,7 +87,7 @@ namespace UserManagementApi.Services
             //await _emailService.SendEmail(addUserDTO.Email, subject, body); 
             #endregion
             // Generate confirmation link
-            var resetLinkHelper = new ResetLinkHelper(_httpContextAccessor);
+            var resetLinkHelper = new ResetLinkHelper(_httpContextAccessor, _configuration);
             var confirmationLink = resetLinkHelper.GenerateConfirmationLink(hashedConfirmationToken);
 
             //Send link for email confirmation
@@ -107,7 +110,7 @@ namespace UserManagementApi.Services
              var result =  await _userRepository.ValidateEmailTokenAsync(confirmationEmailDTO);
 
             // Generate confirmation link
-            var resetLinkHelper = new ResetLinkHelper(_httpContextAccessor);
+            var resetLinkHelper = new ResetLinkHelper(_httpContextAccessor, _configuration);
             var loginLink = resetLinkHelper.GenerateLoginLink();
 
             //Send link via email
@@ -131,7 +134,7 @@ namespace UserManagementApi.Services
             var result = await _userRepository.ResendEmailTokenAsync(resendConfirmationDTO, hashedConfirmationToken);
 
             // Generate confirmation link
-            var resetLinkHelper = new ResetLinkHelper(_httpContextAccessor);
+            var resetLinkHelper = new ResetLinkHelper(_httpContextAccessor, _configuration);
             var confirmationLink = resetLinkHelper.GenerateConfirmationLink(hashedConfirmationToken);
 
             //Send link for email confirmation
@@ -200,7 +203,7 @@ namespace UserManagementApi.Services
                 throw new Exception(ErrorMessages.TokenNotRegistered);
 
             // Generate reset link
-            var resetLinkHelper = new ResetLinkHelper(_httpContextAccessor);
+            var resetLinkHelper = new ResetLinkHelper(_httpContextAccessor, _configuration);
             var resetLink = resetLinkHelper.GenerateResetLink(tokenString);
 
             //Send link via email
@@ -217,6 +220,9 @@ namespace UserManagementApi.Services
             var byteArgumentToken = Convert.FromBase64String(token);
             var hashedToken = HashingHelper.HashToken(byteArgumentToken);
             var (tokenRetrieved, userId, expirationDateTime) = await _userRepository.GetTokenDetailsAsync(hashedToken);
+
+            // retrieved user details
+            var userData = await _userRepository.GetUserData(userId);
 
             //token checking
             if (tokenRetrieved is null)
@@ -251,6 +257,23 @@ namespace UserManagementApi.Services
 
             // reset account lock details
             await _userRepository.ResetAccountLocked(user.Email);
+
+            //Generate login link
+            var resetLinkHelper = new ResetLinkHelper(_httpContextAccessor, _configuration);
+            var loginLink = resetLinkHelper.GenerateLoginLink();
+
+            //Generate forgot password link
+            var forgotPasswordLink = resetLinkHelper.GenerateForgotPasswordLink();
+
+            //Send notification via email
+            var subject = "Your Password Has Been Successfully Reset";
+            var body = $"<p>Hi {userData.Username}, <br>" +
+                       "<p>This is to confirm that your password was successfully reset.</p> <br>" +
+                       $"<p>If you initiated this change, no further action is required. You can now <a href='{loginLink}'>log in</a> with your new password. </p> <br>" +
+                       $"<p>If you did **not** request a password reset, please contact our support team immediately or reset your password again using the <a href='{forgotPasswordLink}'><strong>Forgot Password</strong></a> feature.</p><br>" +
+                       "<p>Thank you for helping us keep your account secure.</p><br><br>" +
+                       "<p>Best Zacari Softier Corp.</p>";
+            await _emailService.SendEmail(userData.Email, subject, body);
 
             return user;
         }

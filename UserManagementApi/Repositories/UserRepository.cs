@@ -44,6 +44,22 @@ namespace UserManagementApi.Repositories
                 .AnyAsync(u => u.Id == id);
         }
 
+        
+        public async Task<UsernameEmailDTO> GetUserData(Guid userId)
+        {
+            var result = await _context.Users
+                .Where(u => u.Id == userId)
+                .AsNoTracking()
+                .Select(u => new {u.UserName, u.Email})
+                .FirstOrDefaultAsync();
+
+            return new UsernameEmailDTO
+            {
+                Username = result?.UserName,
+                Email = result?.Email
+            };
+        }
+
         public async Task<(string? oldPassword, string? salt)> GetOldPasswordAndSaltAsync(Guid userId)
         {
             var user = await _context.Users
@@ -279,7 +295,10 @@ namespace UserManagementApi.Repositories
         public async Task<UserCredentialModel> ValidateEmailTokenAsync(ConfirmationEmailDTO confirmationEmailDTO)
         {
             var result = await _context.Users.IgnoreQueryFilters()
-                .Where(u => !u.IsEmailConfirmed && u.ConfirmationToken == confirmationEmailDTO.ConfirmationToken && u.ConfirmationTokenExpiration > DateTime.UtcNow && !u.IsDeleted)
+                .Where(u => !u.IsEmailConfirmed 
+                && u.ConfirmationToken == confirmationEmailDTO.ConfirmationToken 
+                && u.ConfirmationTokenExpiration > DateTime.UtcNow 
+                && !u.IsDeleted)
                 .FirstOrDefaultAsync();
 
             if (result is null)
