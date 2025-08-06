@@ -142,6 +142,26 @@ namespace UserManagementApi.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<Guid> GetUserByAsync(AuthenticationTokenDetailsDTO authenticationTokenDetails)
+        {
+            var result = await _context.AuthenticationTokens
+                .Where(t => t.Token == authenticationTokenDetails.AuthToken || t.RefreshToken == authenticationTokenDetails.RefreshToken)
+                .Select(t => t.UserId)
+                .FirstOrDefaultAsync();
+
+            if(result == Guid.Empty )
+            {
+                return Guid.Empty;
+            }
+
+            var userDetails = await _context.Users
+                .Where(u => u.Id == result)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            return userDetails.Id;
+        }
+
         public async Task<UserCredentialModel> CreateUserAsync(UserCredentialModel userModel)
         {
             await _context.AddAsync(userModel);

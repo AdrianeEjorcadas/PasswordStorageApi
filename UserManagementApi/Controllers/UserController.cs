@@ -424,6 +424,32 @@ namespace UserManagementApi.Controllers
             }
         }
 
+        [HttpGet("get-user-id")]
+        public async Task<ActionResult> GetUserByTokenAsync(AuthenticationTokenDetailsDTO authenticationTokenDetailsDTO)
+        {
+            try
+            {
+                throw new NotImplementedException();
+            } catch(KeyNotFoundException ex)
+            {
+                return StatusCode(404, new ReturnResponse<object>
+                {
+                    StatusCode = 404,
+                    Message = ex.Message,
+                    Data = new { Error = ex.Message }
+                });
+            } catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ReturnResponse<object>
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Message = "An unexpected error occurred",
+                    Data = new { ExceptionMessage = ex.Message, StackTrace = ex.StackTrace }
+                });
+
+            }
+        }
+
     }
 }
 
