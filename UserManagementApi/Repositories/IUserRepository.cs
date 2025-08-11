@@ -26,7 +26,7 @@ namespace UserManagementApi.Repositories
 
         Task<bool> IsUserLockedAsync(string email);
 
-        Task<Guid> GetUserByAsync(AuthenticationTokenDetailsDTO authenticationTokenDetails);
+        Task<UserDetailsDTO> GetUserByAsync(AuthenticationTokenDetailsDTO authenticationTokenDetails);
 
         Task<(Guid userId, string password, string? salt)> GetUserCredentialAsync(string email);
 

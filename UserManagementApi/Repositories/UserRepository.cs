@@ -142,24 +142,30 @@ namespace UserManagementApi.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Guid> GetUserByAsync(AuthenticationTokenDetailsDTO authenticationTokenDetails)
+        public async Task<UserDetailsDTO?> GetUserByAsync(AuthenticationTokenDetailsDTO authenticationTokenDetails)
         {
-            var result = await _context.AuthenticationTokens
+            var token = await _context.AuthenticationTokens
+                .AsNoTracking()
                 .Where(t => t.Token == authenticationTokenDetails.AuthToken || t.RefreshToken == authenticationTokenDetails.RefreshToken)
-                .Select(t => t.UserId)
                 .FirstOrDefaultAsync();
 
-            if(result == Guid.Empty )
+            if(token == null)
             {
-                return Guid.Empty;
+                return null;
             }
 
             var userDetails = await _context.Users
-                .Where(u => u.Id == result)
                 .AsNoTracking()
+                .Where(u => u.Id == token.UserId)
+                .Select(u => new UserDetailsDTO
+                {
+                    UserId = u.Id,
+                    UserName = u.UserName,
+                    Email = u.Email,
+                })
                 .FirstOrDefaultAsync();
 
-            return userDetails.Id;
+            return userDetails;
         }
 
         public async Task<UserCredentialModel> CreateUserAsync(UserCredentialModel userModel)

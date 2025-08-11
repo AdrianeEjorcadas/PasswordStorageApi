@@ -424,12 +424,18 @@ namespace UserManagementApi.Controllers
             }
         }
 
-        [HttpGet("get-user-id")]
-        public async Task<ActionResult> GetUserByTokenAsync(AuthenticationTokenDetailsDTO authenticationTokenDetailsDTO)
+        [HttpPost("get-user-id")]
+        public async Task<ActionResult<UserDetailsDTO>> GetUserByTokenAsync(AuthenticationTokenDetailsDTO authenticationTokenDetailsDTO)
         {
             try
             {
-                throw new NotImplementedException();
+                var result = await _userService.GetUserByAsync(authenticationTokenDetailsDTO);
+                return Ok(new ReturnResponse<UserDetailsDTO>
+                {
+                    StatusCode = 200,
+                    Message = "Successfully retrieve user data",
+                    Data = result
+                });
             } catch(KeyNotFoundException ex)
             {
                 return StatusCode(404, new ReturnResponse<object>

@@ -34,6 +34,18 @@ namespace UserManagementApi.Services
             return await _userRepository.IsEmailExistingAsync(email);
         }
 
+        public async Task<UserDetailsDTO> GetUserByAsync(AuthenticationTokenDetailsDTO authenticationTokenDetails)
+        {
+            var result = await _userRepository.GetUserByAsync(authenticationTokenDetails);
+
+            if (result == null)
+            {
+                throw new InvalidTokenException("Invalid Token");
+            }
+
+            return result;
+        }
+
         public async Task<UserCredentialModel> CreateUserAsync(AddUserDTO addUserDTO)
         {
             var isUserExists = await _userRepository.IsUserExistAsync(addUserDTO.UserName);
